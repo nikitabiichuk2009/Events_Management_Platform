@@ -85,7 +85,7 @@ body {
 /* ========================================== TAILWIND STYLES */
 @layer utilities {
   .wrapper {
-    @apply max-w-7xl lg:mx-auto p-5 md:px-10 xl:px-0 w-full;
+    @apply max-w-7xl lg:mx-auto p-5 md:px-10 xl:px-5 2xl:px-0 w-full;
   }
 
   .flex-center {
@@ -128,6 +128,10 @@ body {
   /* 28 */
   .h5-bold {
     @apply font-bold text-[28px] leading-[36px];
+  }
+
+  .h5-semibold {
+    @apply font-semibold text-[22px] leading-[30px] lg:text-[24px] lg:leading-[32px] xl:text-[28px] xl:leading-[36px];
   }
 
   /* 24 */
@@ -210,7 +214,15 @@ body {
   }
 
   .input-field {
-    @apply bg-grey-50 h-[54px] focus-visible:ring-offset-0 placeholder:text-grey-500 rounded-full p-regular-16 px-4 py-3 border-none focus-visible:ring-transparent !important;
+    @apply min-h-[56px] border text-[16px] placeholder:text-grey-500 rounded-md font-normal leading-[22.4px] ring-0 focus:ring-0 focus:ring-offset-0 ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-grey-50 !important;
+  }
+
+  .form-description {
+    @apply mt-2.5 font-spaceGrotesk text-[14px] font-medium leading-[19.6px] text-slate-500;
+  }
+
+  .form-label {
+    @apply text-[16px] font-semibold leading-[20.8px];
   }
 
   .textarea {

@@ -40,8 +40,8 @@ export type CreateEventParams = {
     imageUrl: string
     startDateTime: Date
     endDateTime: Date
-    categoryId: string
-    price: string
+    category: string
+    price: number
     isFree: boolean
     url: string
   }
@@ -116,6 +116,7 @@ export type Event = {
 // ====== CATEGORY PARAMS
 export type CreateCategoryParams = {
   categoryName: string
+  followerId: string
 }
 
 // ====== ORDER PARAMS

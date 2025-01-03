@@ -22,10 +22,11 @@ const Header = () => {
           <NavItems />
         </nav>
         <div className="flex justify-end w-32">
-          <SignedIn>
-            <UserButton afterSignOutUrl="/" />
-            <MobileNav />
-          </SignedIn>
+          <div className="mr-4 md:mr-0">
+            <SignedIn>
+              <UserButton afterSignOutUrl="/" />
+            </SignedIn>
+          </div>
           <SignedOut>
             <Button asChild className="rounded-full md:flex hidden" size="lg">
               <Link href="/sign-in">Sign In</Link>

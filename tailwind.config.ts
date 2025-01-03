@@ -69,6 +69,7 @@ module.exports = withUt({
       },
       fontFamily: {
         poppins: ['var(--font-poppins)'],
+        spaceGrotesk: ['var(--font-spaceGrotesk)'],
       },
       backgroundImage: {
         'dotted-pattern': "url('/assets/images/dotted-pattern.png')",

@@ -18,7 +18,7 @@ const NavItems = () => {
             className={`${
               pathname === link.route
                 ? "text-primary-500"
-                : "text-black hover:text-primary-400 whitespace-nowrap duration-200 ease-in-out"
+                : "text-black hover:text-primary-400 whitespace-nowrap transition-colors duration-200 ease-in-out"
             } font-medium`}
           >
             {link.label}

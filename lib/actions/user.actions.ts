@@ -68,10 +68,6 @@ export async function deleteUser(userData: DeleteUserParams) {
       { $pull: { events: { $in: eventIds } } }
     );
 
-    // Delete categories with no associated events
-    await Category.deleteMany({ events: { $size: 0 } });
-
-    // Finally, delete the user
     await User.deleteOne({ clerkId });
 
     revalidatePath("/");
@@ -114,5 +110,16 @@ export async function getUserCategories(params: GetUserStatsParams) {
   } catch (error) {
     console.error("Error fetching user categories:", error);
     throw new Error("Error fetching user categories");
+  }
+}
+
+export async function getUserByClerkId(clerkId: string) {
+  try {
+    await connectToDB();
+    const user = await User.findOne({ clerkId });
+    return user;
+  } catch (error) {
+    console.error("Error fetching user by clerkId:", error);
+    throw new Error("Error fetching user by clerkId");
   }
 }
