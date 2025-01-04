@@ -10,6 +10,8 @@ import { Separator } from "@/components/ui/separator";
 import { auth } from "@clerk/nextjs/server";
 import { getUserByClerkId } from "@/lib/actions/user.actions";
 import EventDetailsHeaderCard from "@/components/shared/cards/EventDetailsCard";
+import { SearchParamsProps } from "@/types";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Evently | Event Details",
@@ -19,8 +21,12 @@ export const metadata: Metadata = {
   },
 };
 
-const EventPage = async ({ params }: { params: { id: string } }) => {
+const EventPage = async ({ params }: { params: SearchParamsProps }) => {
   const resolvedParams = await params;
+  const eventId = resolvedParams.id || "";
+  if (!eventId) {
+    redirect("/")
+  }
   let event;
   let user;
   const { userId } = await auth();
@@ -43,7 +49,7 @@ const EventPage = async ({ params }: { params: { id: string } }) => {
     );
   }
   try {
-    const unParsedEvent = await getEventById(resolvedParams.id);
+    const unParsedEvent = await getEventById(eventId);
     event = stringifyObject(unParsedEvent);
     console.log(event);
   } catch (err) {
