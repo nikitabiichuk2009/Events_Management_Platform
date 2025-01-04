@@ -56,6 +56,7 @@ const EventForm = ({ userId, type, categories }: EventFormProps) => {
   });
 
   const onSubmit = async (values: z.infer<typeof eventSchema>) => {
+    if (isSubmitting) return;
     if (
       values.startDateTime &&
       values.endDateTime &&
@@ -77,7 +78,7 @@ const EventForm = ({ userId, type, categories }: EventFormProps) => {
       });
       return;
     }
-    
+
     setIsSubmitting(true);
 
     values.price = values.isFree ? 0 : values.price;

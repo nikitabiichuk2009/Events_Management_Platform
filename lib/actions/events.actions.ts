@@ -99,3 +99,23 @@ export async function getAllEvents({
     throw new Error("Error fetching all events");
   }
 }
+
+export async function getEventById(eventId: string) {
+  try {
+    await connectToDB();
+
+    const event = await Event.findById(eventId)
+      .populate({ path: "organizer", model: User })
+      .populate({ path: "category", model: Category })
+      .exec();
+
+    if (!event) {
+      throw new Error("Event not found");
+    }
+
+    return event;
+  } catch (err) {
+    console.error("Error fetching event by ID:", err);
+    throw new Error("Error fetching event by ID");
+  }
+}

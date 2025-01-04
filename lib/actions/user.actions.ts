@@ -6,7 +6,7 @@ import User, { IUser } from "../database/models/user.model";
 import Order from "../database/models/order.model";
 import Category, { ICategory } from "../database/models/category.model";
 import Event from "../database/models/event.model";
-import { CreateUserParams, DeleteUserParams, GetUserStatsParams, UpdateUserParams } from "@/types";
+import { CreateUserParams, DeleteUserParams, GetUserStatsParams, SaveEventParams, UpdateUserParams } from "@/types";
 import mongoose from "mongoose";
 
 export async function createUser(userData: CreateUserParams): Promise<IUser> {
@@ -65,6 +65,11 @@ export async function deleteUser(userData: DeleteUserParams): Promise<IUser> {
       { $pull: { events: { $in: eventIds } } }
     );
 
+    await Category.updateMany(
+      { followers: user._id },
+      { $pull: { followers: user._id } }
+    );
+
     await User.deleteOne({ clerkId });
 
     revalidatePath("/");
@@ -118,5 +123,43 @@ export async function getUserByClerkId(clerkId: string) {
   } catch (error) {
     console.error("Error fetching user by clerkId:", error);
     throw new Error("Error fetching user by clerkId");
+  }
+}
+
+export async function saveEvent(params: SaveEventParams): Promise<void> {
+  try {
+    await connectToDB();
+    const { eventId, userClerkId, hasSaved, path } = params;
+
+    const userUpdate = hasSaved
+      ? { $pull: { savedEvents: eventId } }
+      : { $addToSet: { savedEvents: eventId } };
+
+    const user = await User.findOneAndUpdate(
+      { clerkId: userClerkId },
+      userUpdate,
+      { new: true }
+    );
+
+    if (!user) {
+      throw new Error("User not found!");
+    }
+
+    const eventUpdate = hasSaved
+      ? { $inc: { savedCount: -1 } }
+      : { $inc: { savedCount: 1 } };
+
+    const event = await Event.findByIdAndUpdate(eventId, eventUpdate, {
+      new: true,
+    });
+
+    if (!event) {
+      throw new Error("Event not found!");
+    }
+
+    revalidatePath(path);
+  } catch (err) {
+    console.error("Error saving event:", err);
+    throw new Error("Error saving event.");
   }
 }

@@ -51,9 +51,9 @@ const CategoriesPage = async ({
           <h1 className="h2-bold">No Categories Found</h1>
           <NoResults
             title="No categories available"
-            description="Currently, there are no categories to display. Please check back later."
-            buttonTitle="Explore Events"
-            href="/events"
+            description="Currently, there are no categories to display. If no events are available, that means there are no categories to display."
+            buttonTitle="Go create one"
+            href="/create-event"
           />
         </div>
       );

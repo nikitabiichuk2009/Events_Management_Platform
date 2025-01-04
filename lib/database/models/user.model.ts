@@ -12,6 +12,7 @@ export interface IUser extends Document {
   location?: string;
   personalWebsite?: string;
   joinDate: Date;
+  savedEvents: Schema.Types.ObjectId[];
 }
 
 const UserSchema = new Schema({
@@ -26,6 +27,7 @@ const UserSchema = new Schema({
   location: { type: String },
   personalWebsite: { type: String },
   joinDate: { type: Date, default: Date.now },
+  savedEvents: [{ type: Schema.Types.ObjectId, ref: "Event" }],
 });
 
 const User = models.User || model<IUser>("User", UserSchema);

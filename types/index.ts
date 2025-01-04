@@ -30,6 +30,14 @@ export interface GetUserStatsParams {
   pageSize?: number;
 }
 
+export interface SaveEventParams {
+  eventId: string;
+  userClerkId: string;
+  hasSaved: boolean;
+  path: string;
+}
+
+
 // ====== EVENT PARAMS
 export type CreateEventParams = {
   userId: string

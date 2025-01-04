@@ -6,6 +6,19 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+export const formatDateTime = (date: Date): string => {
+  const options: Intl.DateTimeFormatOptions = {
+    month: "2-digit",
+    day: "2-digit",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  };
+
+  return new Intl.DateTimeFormat("en-US", options).format(date);
+};
+
 export const convertFileToUrl = (file: File) => URL.createObjectURL(file)
 
 export const stringifyObject = (obj: any) => JSON.parse(JSON.stringify(obj));

@@ -13,6 +13,7 @@ export interface IEvent extends Document {
   url: string;
   category: Schema.Types.ObjectId;
   organizer: Schema.Types.ObjectId;
+  savedCount: number;
 }
 
 const EventSchema = new Schema({
@@ -28,6 +29,7 @@ const EventSchema = new Schema({
   url: { type: String, required: true },
   category: { type: Schema.Types.ObjectId, ref: "Category" },
   organizer: { type: Schema.Types.ObjectId, ref: "User" },
+  savedCount: { type: Number, default: 0 },
 });
 
 const Event = models.Event || model<IEvent>("Event", EventSchema);
