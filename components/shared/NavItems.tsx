@@ -4,8 +4,6 @@ import { headerLinks } from "@/constants";
 import Link from "next/link";
 import React from "react";
 import { usePathname } from "next/navigation";
-import { SignedOut } from "@clerk/nextjs";
-import { Button } from "../ui/button";
 
 const NavItems = () => {
   const pathname = usePathname();

@@ -1,12 +1,12 @@
 "use server";
 
 import { connectToDB } from "../database";
-import Category from "../database/models/category.model";
+import Category, { ICategory } from "../database/models/category.model";
 
-export async function getAllCategories() {
+export async function getAllCategories(): Promise<ICategory[]> {
   try {
     await connectToDB();
-    const categories = await Category.find({}).lean();
+    const categories = await Category.find({});
     return categories;
   } catch (err) {
     console.error("Error getting all categories:", err);

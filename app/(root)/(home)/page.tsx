@@ -1,8 +1,43 @@
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
+import { getAllEvents } from "@/lib/actions/events.actions";
+import { stringifyObject } from "@/lib/utils";
+import NoResults from "@/components/shared/NoResults";
+import { Metadata } from "next";
 
-export default function Home() {
+export const metadata: Metadata = {
+  title: "Evently | Home",
+  description: "Explore a wide range of events, connect with organizers, and find the perfect event for you.",
+  icons: {
+    icon: "/assets/images/logo.svg"
+  }
+}
+
+export default async function Home() {
+  let events;
+  let eventsCount = 0;
+  try {
+    const result = await getAllEvents({query: "", category: "", limit: 10, page: 1});
+    const parsedResult = stringifyObject(result);
+    events = parsedResult.allEvents;
+    eventsCount = parsedResult.totalEventsCount;
+    console.log(eventsCount)
+    console.log(events)
+  } catch (err) {
+    console.log(err)
+    return (
+      <div className="wrapper flex flex-col items-center">
+        <h1 className="h2-bold">Error occurred</h1>
+        <NoResults
+          title="Error loading events"
+          description="Failed to load events. Please try again later."
+          buttonTitle="Go back"
+          href="/"
+        />
+      </div>
+    );
+  }
   return (
     <>
       <section className="bg-primary-50">
@@ -32,7 +67,7 @@ export default function Home() {
       </div>
     </section>
     <section id="events" className="wrapper my-8 flex-col gap-8 md:gap-12">
-      <h2 className="h2-bold">Trusted by <br /> of Events</h2>
+      <h2 className="h2-bold">Trusted by <span className="text-primary-500">{eventsCount}</span> <br /> of Events</h2>
       <div className="flex w-full flex-col gap-5 md:flex-row">
         Search
         FilterCategory

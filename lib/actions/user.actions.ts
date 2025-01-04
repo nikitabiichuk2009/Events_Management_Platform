@@ -2,14 +2,14 @@
 
 import { revalidatePath } from "next/cache";
 import { connectToDB } from "../database";
-import User from "../database/models/user.model";
+import User, { IUser } from "../database/models/user.model";
 import Order from "../database/models/order.model";
-import Category from "../database/models/category.model";
+import Category, { ICategory } from "../database/models/category.model";
 import Event from "../database/models/event.model";
 import { CreateUserParams, DeleteUserParams, GetUserStatsParams, UpdateUserParams } from "@/types";
 import mongoose from "mongoose";
 
-export async function createUser(userData: CreateUserParams) {
+export async function createUser(userData: CreateUserParams): Promise<IUser> {
   await connectToDB();
 
   try {
@@ -22,7 +22,7 @@ export async function createUser(userData: CreateUserParams) {
   }
 }
 
-export async function updateUser(userData: UpdateUserParams) {
+export async function updateUser(userData: UpdateUserParams): Promise<IUser> {
   const { clerkId, updateData, path } = userData;
 
   await connectToDB();
@@ -42,7 +42,7 @@ export async function updateUser(userData: UpdateUserParams) {
   }
 }
 
-export async function deleteUser(userData: DeleteUserParams) {
+export async function deleteUser(userData: DeleteUserParams): Promise<IUser> {
   const { clerkId } = userData;
 
   await connectToDB();
@@ -53,16 +53,13 @@ export async function deleteUser(userData: DeleteUserParams) {
       throw new Error("User not found!");
     }
 
-    // Delete all associated orders
     await Order.deleteMany({ buyer: user._id });
 
-    // Delete all events created by the user
     const events = await Event.find({ organizer: user._id });
     const eventIds = events.map((event) => event._id);
 
     await Event.deleteMany({ organizer: user._id });
 
-    // Update categories to remove references to deleted events
     await Category.updateMany(
       { events: { $in: eventIds } },
       { $pull: { events: { $in: eventIds } } }
@@ -78,7 +75,7 @@ export async function deleteUser(userData: DeleteUserParams) {
   }
 }
 
-export async function getUserCategories(params: GetUserStatsParams) {
+export async function getUserCategories(params: GetUserStatsParams): Promise<{ categories: ICategory[], isNext: boolean }> {
   try {
     await connectToDB();
     const { userId, page = 1, pageSize = 10 } = params;

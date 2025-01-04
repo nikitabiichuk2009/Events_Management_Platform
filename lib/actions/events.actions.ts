@@ -4,10 +4,10 @@ import { connectToDB } from "../database";
 import User from "../database/models/user.model";
 import Event from "../database/models/event.model";
 import Category from "../database/models/category.model";
-import { CreateEventParams } from "@/types";
+import { CreateEventParams, GetAllEventsParams } from "@/types";
 import { revalidatePath } from "next/cache";
 
-export async function createEvent({ userId, event, path }: CreateEventParams) {
+export async function createEvent({ userId, event, path }: CreateEventParams): Promise<void> {
   try {
     await connectToDB();
 
@@ -59,5 +59,43 @@ export async function createEvent({ userId, event, path }: CreateEventParams) {
   } catch (error) {
     console.error("Error creating event:", error);
     throw new Error("Error creating event");
+  }
+}
+
+export async function getAllEvents({
+  query = "",
+  category = "", // Accepted but not processed for now
+  limit = 10,
+  page = 1,
+}: GetAllEventsParams): Promise<{
+  allEvents: any[];
+  isNextPage: boolean;
+  totalEventsCount: number;
+}> {
+  try {
+    await connectToDB();
+    const skip = (page - 1) * limit;
+
+    const searchQuery: any = {};
+    if (query) {
+      searchQuery.title = { $regex: query, $options: "i" };
+    }
+
+    const allEvents = await Event.find(searchQuery)
+      .sort({ createdAt: "desc" })
+      .skip(skip)
+      .limit(limit)
+      .populate({ path: "organizer", model: User })
+      .populate({ path: "category", model: Category })
+      .exec();
+
+    const totalEventsCount = await Event.countDocuments(searchQuery);
+
+    const isNextPage = totalEventsCount > skip + allEvents.length;
+
+    return { allEvents, isNextPage, totalEventsCount };
+  } catch (err: any) {
+    console.error("Error fetching all events:", err);
+    throw new Error("Error fetching all events");
   }
 }
