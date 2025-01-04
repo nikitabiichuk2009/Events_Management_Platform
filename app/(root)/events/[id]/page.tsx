@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 };
 
 const EventPage = async ({ params }: { params: { id: string } }) => {
-  const { id } = await params;
+  const resolvedParams = await params;
   let event;
   let user;
   const { userId } = await auth();
@@ -43,7 +43,7 @@ const EventPage = async ({ params }: { params: { id: string } }) => {
     );
   }
   try {
-    const unParsedEvent = await getEventById(id);
+    const unParsedEvent = await getEventById(resolvedParams.id);
     event = stringifyObject(unParsedEvent);
     console.log(event);
   } catch (err) {
