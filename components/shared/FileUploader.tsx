@@ -21,7 +21,7 @@ export default function FileUploader({ imageUrl, onFieldChange, setFiles }: File
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
-    accept: 'image/*' ? generateClientDropzoneAccept(['image/*']) : undefined,
+    accept: generateClientDropzoneAccept(['image/*']),
   })
 
   return (
