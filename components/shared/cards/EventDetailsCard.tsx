@@ -29,8 +29,8 @@ export default function EventDetailsHeaderCard({
         path: `/events/${eventId}`,
       });
       toast({
-        title: "Event saved",
-        description: "You can now find it in your saved events",
+        title: hasSaved ? "Event removed from saved" : "Event saved",
+        description: hasSaved ? "Successfully removed from saved events" : "Successfully saved to your events. You can find it in your saved events",
         className: "bg-green-500 text-white border-none",
       });
     } catch (err) {
