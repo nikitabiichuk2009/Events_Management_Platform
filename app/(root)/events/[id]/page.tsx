@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   },
 };
 
-const EventPage = async ({ params }: { params: SearchParamsProps }) => {
+const EventPage = async ({ params }: { params: Promise<SearchParamsProps> }) => {
   const resolvedParams = await params;
   const eventId = resolvedParams.id || "";
   if (!eventId) {
