@@ -42,8 +42,8 @@ export default async function CreateEventPage() {
   }
 
   try {
-    const categoryList = await getAllCategories();
-    const parsedCategory = stringifyObject(categoryList);
+    const categoryList = await getAllCategories({});
+    const parsedCategory = stringifyObject(categoryList.categories);
     categories = parsedCategory.map((category: any) => ({
       name: category.name,
     }));
@@ -68,8 +68,8 @@ export default async function CreateEventPage() {
         <div className="wrapper flex flex-col gap-2 text-center sm:text-left">
           <h2 className="h2-bold">Create an Event</h2>
           <p className="p-regular-16 md:p-regular-18 xl:p-regular-20 text-primary-400 font-spaceGrotesk">
-            Turn your vision into an unforgettable experience — create your event
-            today!
+            Turn your vision into an unforgettable experience — create your
+            event today!
           </p>
         </div>
       </section>

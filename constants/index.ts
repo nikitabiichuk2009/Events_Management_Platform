@@ -29,3 +29,11 @@ export const eventDefaultValues = {
   isFree: false,
   url: '',
 }
+
+// Filters
+export const CategoryFilters = [
+  { name: "Popular", value: "popular" },
+  { name: "Recent", value: "recent" },
+  { name: "Name", value: "name" },
+  { name: "Old", value: "old" },
+];

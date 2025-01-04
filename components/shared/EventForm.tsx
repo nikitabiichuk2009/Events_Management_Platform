@@ -424,6 +424,7 @@ const EventForm = ({ userId, type, categories }: EventFormProps) => {
           type="submit"
           className="w-full md:w-fit"
           disabled={isSubmitting}
+          size="lg"
         >
           {isSubmitting ? "Submitting..." : "Submit"}
         </Button>

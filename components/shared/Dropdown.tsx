@@ -64,7 +64,7 @@ const Dropdown = ({
             <SelectItem
               key={`${category.name}-${index}`}
               value={category.name}
-              className="duration-200 transition-colors ease-in-out hover:bg-primary-50 text-base"
+              className="duration-200 transition-colors ease-in-out hover:bg-primary-50 bg-white text-base"
             >
               {category.name}
             </SelectItem>

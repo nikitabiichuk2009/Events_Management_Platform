@@ -5,6 +5,11 @@ import { stringifyObject } from "@/lib/utils";
 import { Metadata } from "next";
 import { ICategory } from "@/lib/database/models/category.model";
 import CategoryCard from "@/components/shared/cards/CategoryCard";
+import SearchBar from "@/components/shared/SearchBar";
+import Filter from "@/components/shared/Filter";
+import { CategoryFilters } from "@/constants";
+import Pagination from "@/components/shared/Pagination";
+import { SearchParamsProps } from "@/types";
 
 export const metadata: Metadata = {
   title: "Evently | All Categories Page",
@@ -14,12 +19,31 @@ export const metadata: Metadata = {
   },
 };
 
-const CategoriesPage = async () => {
+const CategoriesPage = async ({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParamsProps>;
+}) => {
+  const resolvedSearchParams = await searchParams; // Next js 15 update! We should await params
+
+  const searchQuery = resolvedSearchParams.q || "";
+  const filter = resolvedSearchParams.filter || "";
+  const page = resolvedSearchParams.page
+    ? parseInt(resolvedSearchParams.page, 10)
+    : 1;
+
   let allCategories;
+  let isNext;
 
   try {
-    const categories = await getAllCategories();
-    allCategories = stringifyObject(categories);
+    const categories = await getAllCategories({
+      query: searchQuery,
+      filter,
+      page,
+      pageSize: 10,
+    });
+    allCategories = stringifyObject(categories.categories);
+    isNext = categories.isNext;
 
     if (allCategories.length === 0) {
       return (
@@ -35,7 +59,7 @@ const CategoriesPage = async () => {
       );
     }
   } catch (error) {
-    console.log(error);
+    console.error("Error fetching categories:", error);
     return (
       <div className="wrapper flex flex-col items-center">
         <h1 className="h2-bold">Error Occurred</h1>
@@ -61,6 +85,19 @@ const CategoriesPage = async () => {
         </div>
       </section>
       <section className="wrapper">
+        <div className="mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center">
+          <SearchBar
+            searchFor="Search for categories"
+            iconPosition="left"
+            route="/categories"
+            imgSrc="/assets/icons/search.svg"
+            otherClasses="flex-1"
+          />
+          <Filter
+            filters={CategoryFilters}
+            otherClasses="min-h-[56px] sm:min-w-[170px]"
+          />
+        </div>
         <div className="mt-8 flex flex-wrap gap-4">
           {allCategories.map((category: ICategory & { _id: string }) => (
             <CategoryCard
@@ -70,6 +107,9 @@ const CategoriesPage = async () => {
               eventCount={category.events.length}
             />
           ))}
+        </div>
+        <div className="mt-10">
+          <Pagination pageNumber={page} isNext={isNext} />
         </div>
       </section>
     </>
