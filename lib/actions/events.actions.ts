@@ -6,6 +6,7 @@ import Event from "../database/models/event.model";
 import Category from "../database/models/category.model";
 import { CreateEventParams, GetAllEventsParams, UpdateEventParams } from "@/types";
 import { revalidatePath } from "next/cache";
+import Order from "../database/models/order.model";
 
 export async function createEvent({ userId, event, path }: CreateEventParams): Promise<void> {
   try {
@@ -230,5 +231,43 @@ export async function getEventById(eventId: string) {
   } catch (err) {
     console.error("Error fetching event by ID:", err);
     throw new Error("Error fetching event by ID");
+  }
+}
+
+export async function deleteEventById(eventId: string): Promise<void> {
+  try {
+    await connectToDB();
+
+    const event = await Event.findById(eventId).populate({
+      path: "category",
+      select: "_id",
+      model: Category
+    });
+    if (!event) {
+      throw new Error("Event not found");
+    }
+
+    await Category.updateOne(
+      { _id: event.category },
+      { $pull: { events: event._id } }
+    );
+
+    await User.updateMany(
+      { savedEvents: event._id },
+      { $pull: { savedEvents: event._id } }
+    );
+
+    await Order.deleteMany({ event: event._id });
+
+    await Event.findByIdAndDelete(eventId);
+
+    revalidatePath("/saved")
+    revalidatePath("/")
+    revalidatePath(`/categories/${event.category._id.toString()}`)
+
+    console.log(`Event with ID ${eventId} deleted successfully.`);
+  } catch (error) {
+    console.error("Error deleting event:", error);
+    throw new Error("Error deleting event");
   }
 }

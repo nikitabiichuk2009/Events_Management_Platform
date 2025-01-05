@@ -20,11 +20,11 @@ export const metadata: Metadata = {
   },
 };
 
-const SavedEventsPage = async ({
+export default async function SavedEventsPage({
   searchParams,
 }: {
   searchParams: Promise<SearchParamsProps>;
-}) => {
+}) {
   const { userId } = await auth();
   if (!userId) {
     return redirect("/sign-in");
@@ -105,5 +105,3 @@ const SavedEventsPage = async ({
     </>
   );
 };
-
-export default SavedEventsPage;

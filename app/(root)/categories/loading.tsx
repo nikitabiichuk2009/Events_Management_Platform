@@ -1,14 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
-import { Metadata } from "next";
 import React from "react";
-
-export const metadata: Metadata = {
-  title: "Evently | Loading Categories",
-  description: "Loading the categories page on Evently.",
-  icons: {
-    icon: "/assets/images/logo.svg",
-  },
-};
 
 const CategoriesLoading = () => {
   return (

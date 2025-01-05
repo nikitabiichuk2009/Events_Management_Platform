@@ -8,6 +8,19 @@ import { Event } from "@/types";
 import { formatDateTime } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { deleteEventById } from "@/lib/actions/events.actions";
+import { useToast } from "@/hooks/use-toast";
 
 type EventCardProps = {
   event: Event;
@@ -22,6 +35,23 @@ export default function EventCard({
   hidePrice,
   userClerkId,
 }: EventCardProps) {
+  const { toast } = useToast()
+  const handleDeleteEvent = async () => {
+    try {
+      await deleteEventById(event._id)
+      toast({
+        title: "Event deleted successfully",
+        description: "Your event has been deleted successfully",
+        className: "bg-green-500 text-white border-none",
+      })
+    } catch (error) {
+      toast({
+        title: "Error deleting event",
+        description: "An error occurred while deleting your event",
+        className: "bg-red-500 text-white border-none",
+      })
+    }
+  }
   return (
     <CardContainer className="shadow-lg rounded-xl overflow-hidden">
       <CardBody className="bg-primary-50 relative group/card border-black/[0.1] w-auto sm:w-[25rem] h-auto rounded-xl p-6 border">
@@ -40,12 +70,31 @@ export default function EventCard({
                   height={16}
                 />
               </Link>
-              <Image
-                src="/assets/icons/delete.svg"
-                alt="delete icon"
-                width={16}
-                height={16}
-              />
+              <AlertDialog>
+                <AlertDialogTrigger>
+                  <Image
+                    src="/assets/icons/delete.svg"
+                    alt="delete icon"
+                    width={16}
+                    height={16}
+                  />
+                </AlertDialogTrigger>
+                <AlertDialogContent className="bg-gray-50">
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Are you absolutely sure?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete
+                      your event.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleDeleteEvent}>Delete</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           )}
         </CardItem>

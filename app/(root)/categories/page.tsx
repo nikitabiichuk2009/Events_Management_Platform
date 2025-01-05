@@ -19,11 +19,11 @@ export const metadata: Metadata = {
   },
 };
 
-const CategoriesPage = async ({
+export default async function CategoriesPage({
   searchParams,
 }: {
   searchParams: Promise<SearchParamsProps>;
-}) => {
+}) {
   const resolvedSearchParams = await searchParams; // Next js 15 update! We should await params
 
   const searchQuery = resolvedSearchParams.q || "";
@@ -110,5 +110,3 @@ const CategoriesPage = async ({
     </>
   );
 };
-
-export default CategoriesPage;

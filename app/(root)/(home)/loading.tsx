@@ -1,14 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import React from "react";
-import { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "Evently | Loading Home",
-  description: "Loading the home page on Evently.",
-  icons: {
-    icon: "/assets/images/logo.svg",
-  },
-};
 
 export default function HomeLoading() {
   return (

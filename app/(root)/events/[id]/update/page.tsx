@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   },
 };
 
-const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
+export default async function UpdateEventPage({ params }: { params: Promise<{ id: string }> }) {
   const { userId } = await auth();
   const resolvedParams = await params;
   let event;
@@ -90,5 +90,3 @@ const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
     </>
   );
 };
-
-export default Page;

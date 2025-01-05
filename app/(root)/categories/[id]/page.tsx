@@ -19,13 +19,13 @@ export const metadata: Metadata = {
   },
 };
 
-const CategoryPage = async ({
+export default async function CategoryPage({
   params,
   searchParams,
 }: {
   params: Promise<{ id: string }>;
   searchParams: Promise<SearchParamsProps>;
-}) => {
+}) {
   const resolvedSearchParams = await searchParams;
   const resolvedParams = await params;
   const categoryId = resolvedParams.id;
@@ -106,5 +106,3 @@ const CategoryPage = async ({
     </>
   );
 };
-
-export default CategoryPage;

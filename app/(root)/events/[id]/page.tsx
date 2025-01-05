@@ -21,11 +21,11 @@ export const metadata: Metadata = {
   },
 };
 
-const EventPage = async ({
+export default async function EventPage({
   params,
 }: {
   params: Promise<{ id: string }>;
-}) => {
+}) {
   const resolvedParams = await params;
   const eventId = resolvedParams.id || "";
   if (!eventId) {
@@ -164,6 +164,4 @@ const EventPage = async ({
       </section>
     </>
   );
-};
-
-export default EventPage;
+}
