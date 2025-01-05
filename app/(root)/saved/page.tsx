@@ -1,65 +1,64 @@
 import React from "react";
-import { getEventsByCategoryId } from "@/lib/actions/category.actions";
+import NoResults from "@/components/shared/NoResults";
+import { getUserSavedEventsByClerkId } from "@/lib/actions/user.actions";
 import { stringifyObject } from "@/lib/utils";
 import { Metadata } from "next";
 import EventsCollection from "@/components/shared/EventsCollection";
 import SearchBar from "@/components/shared/SearchBar";
 import Filter from "@/components/shared/Filter";
-import Pagination from "@/components/shared/Pagination";
-import NoResults from "@/components/shared/NoResults";
 import { EventFilters } from "@/constants";
+import Pagination from "@/components/shared/Pagination";
 import { SearchParamsProps } from "@/types";
+import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
-  title: "Evently | Category Events",
-  description: "View all events associated with this category on Evently.",
+  title: "Evently | Saved Events",
+  description: "View all your saved events on Evently.",
   icons: {
     icon: "/assets/images/logo.svg",
   },
 };
 
-const CategoryPage = async ({
-  params,
+const SavedEventsPage = async ({
   searchParams,
 }: {
-  params: Promise<{ id: string }>;
   searchParams: Promise<SearchParamsProps>;
 }) => {
-  const resolvedSearchParams = await searchParams;
-  const resolvedParams = await params;
-  const categoryId = resolvedParams.id;
-  if (!categoryId) {
-    return redirect("/categories");
+  const { userId } = await auth();
+  if (!userId) {
+    return redirect("/sign-in");
   }
+  const resolvedSearchParams = await searchParams;
+
   const searchQuery = resolvedSearchParams.q || "";
   const filter = resolvedSearchParams.filter || "";
   const page = resolvedSearchParams.page
     ? parseInt(resolvedSearchParams.page, 10)
     : 1;
 
-  let events;
+  let savedEvents;
   let isNext;
 
   try {
-    const result = await getEventsByCategoryId({
-      categoryId,
+    const result = await getUserSavedEventsByClerkId({
+      clerkId: userId,
       query: searchQuery,
-      filter,
+      category: filter,
       page,
       limit: 10,
     });
     const parsedResult = stringifyObject(result);
-    events = parsedResult.events;
+    savedEvents = parsedResult.savedEvents;
     isNext = parsedResult.isNext;
   } catch (error) {
-    console.error("Error fetching category events:", error);
+    console.error("Error fetching saved events:", error);
     return (
       <div className="wrapper flex flex-col items-center">
         <h1 className="h2-bold">Error Occurred</h1>
         <NoResults
-          title="Error loading events"
-          description="Failed to load events for this category. Please try again later."
+          title="Error loading saved events"
+          description="Failed to load saved events. Please try again later."
           buttonTitle="Go back"
           href="/"
         />
@@ -71,18 +70,18 @@ const CategoryPage = async ({
     <>
       <section className="bg-primary-50 py-5 md:py-10">
         <div className="wrapper flex flex-col gap-2 text-center sm:text-left">
-          <h2 className="h2-bold">Explore Events in this Category</h2>
+          <h2 className="h2-bold">Your Saved Events</h2>
           <p className="p-regular-16 md:p-regular-18 xl:p-regular-20 text-primary-400 font-spaceGrotesk">
-            Discover events that match your interest in this category.
+            Access all your saved events in one place.
           </p>
         </div>
       </section>
       <section className="wrapper">
         <div className="mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center">
           <SearchBar
-            searchFor="Search events in this category"
+            searchFor="Search saved events"
             iconPosition="left"
-            route={`/categories/${categoryId}`}
+            route="/saved-events"
             imgSrc="/assets/icons/search.svg"
             otherClasses="flex-1"
           />
@@ -92,12 +91,12 @@ const CategoryPage = async ({
           />
         </div>
         <EventsCollection
-          data={events}
+          data={savedEvents}
           collectionType="All_Events"
-          emptyTitle="No events found"
-          emptyDescription="No events found in this category right now. Check back later!"
+          emptyTitle="No saved events found"
+          emptyDescription="You don't have any saved events. Explore events and save them!"
           emptyButtonTitle="Explore Events"
-          emptyButtonHref="/#events"
+          emptyButtonHref="/"
         />
         <div className="mt-10">
           <Pagination pageNumber={page} isNext={isNext} />
@@ -107,4 +106,4 @@ const CategoryPage = async ({
   );
 };
 
-export default CategoryPage;
+export default SavedEventsPage;

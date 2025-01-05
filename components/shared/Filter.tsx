@@ -72,7 +72,7 @@ const Filter = ({ filters, otherClasses, containerClasses }: Props) => {
                 disabled={isButtonDisabled}
                 key={item.value}
                 value={item.value}
-                className={`cursor-pointer hover:bg-primary-50 transition-colors ease-in-out duration-300 bg-white ${
+                className={`cursor-pointer hover:bg-primary-50 transition-colors focus-visible:ring-0 focus-visible:ring-offset-0 duration-300 bg-white ${
                   search === item.value
                     ? "text-black font-medium"
                     : "text-primary-400"

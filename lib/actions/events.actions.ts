@@ -202,11 +202,11 @@ export async function getAllEvents({
       .populate({ path: "category", model: Category })
       .exec();
 
-    const totalEventsCount = await Event.countDocuments();
-
+    const totalEventsCount = await Event.countDocuments(searchQuery);
+    const totalEventsCountWithoutQuery = await Event.countDocuments();
     const isNextPage = totalEventsCount > skip + allEvents.length;
 
-    return { allEvents, isNextPage, totalEventsCount };
+    return { allEvents, isNextPage, totalEventsCount: totalEventsCountWithoutQuery };
   } catch (err: any) {
     console.error("Error fetching all events:", err);
     throw new Error("Error fetching all events");

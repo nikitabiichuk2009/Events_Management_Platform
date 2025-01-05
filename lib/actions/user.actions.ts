@@ -5,9 +5,10 @@ import { connectToDB } from "../database";
 import User, { IUser } from "../database/models/user.model";
 import Order from "../database/models/order.model";
 import Category, { ICategory } from "../database/models/category.model";
-import Event from "../database/models/event.model";
-import { CreateUserParams, DeleteUserParams, GetUserStatsParams, SaveEventParams, UpdateUserParams } from "@/types";
+import Event, { IEvent } from "../database/models/event.model";
+import { CreateUserParams, DeleteUserParams, GetSavedEventsByUserParams, GetUserStatsParams, SaveEventParams, UpdateUserParams } from "@/types";
 import mongoose from "mongoose";
+import { FilterQuery } from "mongoose";
 
 export async function createUser(userData: CreateUserParams): Promise<IUser> {
   await connectToDB();
@@ -164,5 +165,81 @@ export async function saveEvent(params: SaveEventParams): Promise<void> {
   } catch (err) {
     console.error("Error saving event:", err);
     throw new Error("Error saving event.");
+  }
+}
+
+export async function getUserSavedEventsByClerkId({
+  clerkId,
+  query = "",
+  category = "",
+  limit = 10,
+  page = 1,
+}: GetSavedEventsByUserParams): Promise<{
+  savedEvents: Event[];
+  isNextPage: boolean;
+}> {
+  try {
+    await connectToDB();
+
+    const user = await User.findOne({ clerkId }).populate({ path: "savedEvents", model: Event });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const skip = (page - 1) * limit;
+
+    const searchQuery: FilterQuery<IEvent & { _id: string }> = {
+      _id: { $in: user.savedEvents.map((event: IEvent & { _id: string }) => event._id) },
+    };
+
+    if (query) {
+      searchQuery.title = { $regex: query, $options: "i" };
+    }
+
+    let sortOption = {};
+    switch (category) {
+      case "popular":
+        sortOption = { savedCount: -1 };
+        break;
+      case "recent":
+        sortOption = { createdAt: -1 };
+        break;
+      case "name":
+        sortOption = { title: 1 };
+        break;
+      case "old":
+        sortOption = { createdAt: 1 };
+        break;
+      case "free":
+        searchQuery.isFree = true;
+        sortOption = { createdAt: -1 };
+        break;
+      case "cheapest":
+        sortOption = { price: 1 };
+        break;
+      case "most-expensive":
+        sortOption = { price: -1 };
+        break;
+      default:
+        sortOption = { createdAt: -1 };
+        break;
+    }
+
+    const savedEvents = await Event.find(searchQuery)
+      .sort(sortOption)
+      .skip(skip)
+      .limit(limit)
+      .populate({ path: "organizer", model: User })
+      .populate({ path: "category", model: Category })
+      .exec();
+
+    const totalSavedEventsCount = await Event.countDocuments(searchQuery);
+    const isNextPage = totalSavedEventsCount > skip + savedEvents.length;
+
+    return { savedEvents, isNextPage };
+  } catch (err) {
+    console.error("Error fetching saved events:", err);
+    throw new Error("Error fetching saved events");
   }
 }

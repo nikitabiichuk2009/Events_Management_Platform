@@ -1,9 +1,11 @@
 "use server";
 
-import { GetAllCategoriesParams } from "@/types";
+import { GetAllCategoriesParams, GetEventsByCategoryIdParams } from "@/types";
 import { connectToDB } from "../database";
 import Category, { ICategory } from "../database/models/category.model";
 import { FilterQuery } from "mongoose";
+import Event from "../database/models/event.model";
+import User from "../database/models/user.model";
 
 export async function getAllCategories(params: GetAllCategoriesParams): Promise<{ categories: ICategory[], isNext: boolean }> {
   try {
@@ -16,7 +18,7 @@ export async function getAllCategories(params: GetAllCategoriesParams): Promise<
     let sortOption = {};
     switch (filter) {
       case "popular":
-        sortOption = { followers: -1 };
+        sortOption = { eventsCount: -1 };
         break;
       case "recent":
         sortOption = { createdAt: -1 };
@@ -28,15 +30,98 @@ export async function getAllCategories(params: GetAllCategoriesParams): Promise<
         sortOption = { createdAt: 1 };
         break;
       default:
-        sortOption = { questionsCount: -1 };
+        sortOption = { eventsCount: -1 };
         break;
     }
-    const categories = await Category.find(searchQuery).sort(sortOption).skip((page - 1) * pageSize).limit(pageSize);
+    const categories = await Category.aggregate([
+      { $match: searchQuery },
+      { 
+        $addFields: {
+          eventsCount: { $size: "$events" }
+        }
+      },
+      { $sort: sortOption },
+      { $skip: (page - 1) * pageSize },
+      { $limit: pageSize }
+    ]);
     const totalCategories = await Category.countDocuments(searchQuery);
     const hasNextPage = totalCategories > ((page - 1) * pageSize) + categories.length;
     return { categories, isNext: hasNextPage };
   } catch (err) {
     console.error("Error getting all categories:", err);
     throw new Error("Error getting all categories");
+  }
+}
+
+export async function getEventsByCategoryId({
+  categoryId,
+  query = "",
+  filter = "",
+  page = 1,
+  limit = 10,
+}: GetEventsByCategoryIdParams): Promise<{ events: Event[], isNext: boolean }> {
+  try {
+    await connectToDB();
+    const skip = (page - 1) * limit;
+
+    const categoryExists = await Category.findById(categoryId);
+    if (!categoryExists) {
+      throw new Error("Category not found");
+    }
+
+    const searchQuery: any = {
+      category: categoryId,
+    };
+    if (query) {
+      searchQuery.title = { $regex: query, $options: "i" };
+    }
+
+    let sortOption = {};
+    switch (filter) {
+      case "popular":
+        sortOption = { savedCount: -1 };
+        break;
+      case "recent":
+        sortOption = { createdAt: -1 };
+        break;
+      case "name":
+        sortOption = { title: 1 };
+        break;
+      case "old":
+        sortOption = { createdAt: 1 };
+        break;
+      case "free":
+        searchQuery.isFree = true;
+        sortOption = { createdAt: -1 };
+        break;
+      case "cheapest":
+        sortOption = { price: 1 };
+        break;
+      case "most-expensive":
+        sortOption = { price: -1 };
+        break;
+      default:
+        sortOption = { createdAt: -1 };
+        break;
+    }
+
+    const events = await Event.find(searchQuery)
+      .sort(sortOption)
+      .skip(skip)
+      .limit(limit)
+      .populate({ path: "organizer", model: User })
+      .populate({ path: "category", model: Category })
+      .exec();
+
+    const totalEventsCount = await Event.countDocuments(searchQuery);
+    const isNextPage = totalEventsCount > skip + events.length;
+
+    return {
+      events,
+      isNext: isNextPage,
+    };
+  } catch (err) {
+    console.error("Error fetching events by category:", err);
+    throw new Error("Error fetching events by category");
   }
 }

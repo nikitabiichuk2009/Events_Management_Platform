@@ -6,6 +6,7 @@ import { stringifyObject } from "@/lib/utils";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { Metadata } from "next";
+import { ICategory } from "@/lib/database/models/category.model";
 
 export const metadata: Metadata = {
   title: "Evently | Create Event",
@@ -44,7 +45,7 @@ export default async function CreateEventPage() {
   try {
     const categoryList = await getAllCategories({});
     const parsedCategory = stringifyObject(categoryList.categories);
-    categories = parsedCategory.map((category: any) => ({
+    categories = parsedCategory.map((category: ICategory) => ({
       name: category.name,
     }));
   } catch (err) {

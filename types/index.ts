@@ -96,6 +96,14 @@ export type GetEventsByUserParams = {
   page: number
 }
 
+export type GetSavedEventsByUserParams = {
+  clerkId: string;
+  query?: string;
+  category?: string;
+  limit?: number;
+  page?: number;
+}
+
 export type GetRelatedEventsByCategoryParams = {
   categoryId: string
   eventId: string
@@ -113,6 +121,13 @@ export type GetAllCategoriesParams = {
   filter?: string;
 }
 
+export type GetEventsByCategoryIdParams = {
+  categoryId: string
+  query?: string
+  filter?: string
+  page?: number
+  limit?: number
+}
 // ====== ORDER PARAMS
 export type CheckoutOrderParams = {
   eventTitle: string

@@ -44,20 +44,6 @@ const CategoriesPage = async ({
     });
     allCategories = stringifyObject(categories.categories);
     isNext = categories.isNext;
-
-    if (allCategories.length === 0) {
-      return (
-        <div className="wrapper flex flex-col items-center">
-          <h1 className="h2-bold">No Categories Found</h1>
-          <NoResults
-            title="No categories available"
-            description="Currently, there are no categories to display. If no events are available, that means there are no categories to display."
-            buttonTitle="Go create one"
-            href="/create-event"
-          />
-        </div>
-      );
-    }
   } catch (error) {
     console.error("Error fetching categories:", error);
     return (
@@ -99,14 +85,23 @@ const CategoriesPage = async ({
           />
         </div>
         <div className="mt-8 flex flex-wrap gap-4">
-          {allCategories.map((category: ICategory & { _id: string }) => (
-            <CategoryCard
-              key={category._id}
-              id={category._id}
-              name={category.name}
-              eventCount={category.events.length}
+          {allCategories.length > 0 ? (
+            allCategories.map((category: ICategory & { _id: string }) => (
+              <CategoryCard
+                key={category._id}
+                id={category._id}
+                name={category.name}
+                eventCount={category.events.length}
+              />
+            ))
+          ) : (
+            <NoResults
+              title="No categories found"
+              description="Currently, there are no categories to display. If no events are available, that means there are no categories to display."
+              buttonTitle="Go create one"
+              href="/create-event"
             />
-          ))}
+          )}
         </div>
         <div className="mt-10">
           <Pagination pageNumber={page} isNext={isNext} />
