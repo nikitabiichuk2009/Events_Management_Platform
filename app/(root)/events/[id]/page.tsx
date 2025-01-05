@@ -155,7 +155,7 @@ export default async function EventPage({
                   alt="calendar"
                   width={32}
                   height={32}
-                  className="w-6 h-6 xl:w-8 xl:h-8"
+                  className="size-6 xl:size-8"
                 />
                 <p className="p-medium-16 xl:p-medium-18">
                   {formatDateTime(event.startDateTime)} -{" "}
@@ -168,7 +168,7 @@ export default async function EventPage({
                   alt="location"
                   width={32}
                   height={32}
-                  className="w-6 h-6 xl:w-8 xl:h-8"
+                  className="size-6 xl:size-8"
                 />
                 <p className="p-medium-16 xl:p-medium-18">{event.location}</p>
               </div>
@@ -181,7 +181,7 @@ export default async function EventPage({
                   alt="link"
                   width={28}
                   height={28}
-                  className="w-5 h-5 xl:w-7 xl:h-7"
+                  className="size-5 xl:size-7"
                 />
                 <p className="p-medium-16 xl:p-medium-18 text-primary-400 hover:text-primary-500 ease-in-out duration-300 transition-colors line-clamp-1">
                   {event.url}
