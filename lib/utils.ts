@@ -6,7 +6,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export const formatDateTime = (date: Date): string => {
+export const formatDateTime = (date: any): string => {
   const options: Intl.DateTimeFormatOptions = {
     month: "2-digit",
     day: "2-digit",
@@ -16,7 +16,7 @@ export const formatDateTime = (date: Date): string => {
     hour12: true,
   };
 
-  return new Intl.DateTimeFormat("en-US", options).format(date);
+  return new Intl.DateTimeFormat("en-US", options).format(new Date(date));
 };
 
 export const convertFileToUrl = (file: File) => URL.createObjectURL(file)

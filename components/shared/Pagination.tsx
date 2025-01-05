@@ -42,7 +42,7 @@ const Pagination = ({
       >
         <p className="text-body-semibold text-light-1">Prev</p>
       </Button>
-      <div className="flex items-center justify-center text-white rounded-md bg-[#9694FF] p-3.5 py-2">
+      <div className="flex items-center justify-center text-white rounded-md bg-primary-500/100 p-3.5 py-2">
         <p className="text-body-semibold text-light-2">{pageNumber}</p>
       </div>
       <Button

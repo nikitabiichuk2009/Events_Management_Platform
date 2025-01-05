@@ -4,7 +4,7 @@ import { connectToDB } from "../database";
 import User from "../database/models/user.model";
 import Event from "../database/models/event.model";
 import Category from "../database/models/category.model";
-import { CreateEventParams, GetAllEventsParams } from "@/types";
+import { CreateEventParams, GetAllEventsParams, UpdateEventParams } from "@/types";
 import { revalidatePath } from "next/cache";
 
 export async function createEvent({ userId, event, path }: CreateEventParams): Promise<void> {
@@ -62,6 +62,90 @@ export async function createEvent({ userId, event, path }: CreateEventParams): P
   }
 }
 
+export async function updateEvent({
+  userId,
+  event,
+  path,
+}: UpdateEventParams): Promise<void> {
+  try {
+    await connectToDB();
+
+    const existingEvent = await Event.findById(event._id).populate({
+      path: "organizer",
+      model: User,
+    }).populate({
+      path: "category",
+      model: Category,
+    });
+
+    if (!existingEvent) {
+      throw new Error("Event not found");
+    }
+
+    if (existingEvent.organizer.clerkId !== userId) {
+      throw new Error("You are not authorized to update this event");
+    }
+
+    const newCategory = await Category.findOneAndUpdate(
+      { name: event.category },
+      {
+        $setOnInsert: {
+          name: event.category,
+          followers: [existingEvent.organizer._id],
+          events: [],
+        },
+      },
+      { upsert: true, new: true }
+    );
+    console.log({ existingEventCategoryName: existingEvent.category.name, newCategoryName: newCategory.name });
+    const isCategoryChanged = existingEvent.category.name !== newCategory.name;
+
+    await Category.updateOne(
+      { _id: newCategory._id },
+      { $addToSet: { followers: existingEvent.organizer._id } }
+    );
+
+    // If the category has changed, remove the event from the old category
+    if (isCategoryChanged) {
+      await Category.updateOne(
+        { _id: existingEvent.category },
+        { $pull: { events: existingEvent._id } }
+      );
+    }
+    const updatedEvent = await Event.findByIdAndUpdate(
+      event._id,
+      {
+        title: event.title,
+        description: event.description,
+        location: event.location,
+        imageUrl: event.imageUrl,
+        startDateTime: event.startDateTime,
+        endDateTime: event.endDateTime,
+        price: event.price,
+        isFree: event.isFree,
+        url: event.url,
+        category: newCategory._id,
+      },
+      { new: true }
+    );
+
+    if (!updatedEvent) {
+      throw new Error("Error updating event");
+    }
+
+    await Category.updateOne(
+      { _id: newCategory._id },
+      { $addToSet: { events: updatedEvent._id } }
+    );
+
+    revalidatePath(path);
+  } catch (error) {
+    console.error("Error updating event:", error);
+    throw new Error("Error updating event");
+  }
+}
+
+
 export async function getAllEvents({
   query = "",
   category = "", // Accepted but not processed for now
@@ -81,15 +165,44 @@ export async function getAllEvents({
       searchQuery.title = { $regex: query, $options: "i" };
     }
 
+    let sortOption = {};
+    switch (category) {
+      case "popular":
+        sortOption = { savedCount: -1 };
+        break;
+      case "recent":
+        sortOption = { createdAt: -1 };
+        break;
+      case "name":
+        sortOption = { name: 1 };
+        break;
+      case "old":
+        sortOption = { createdAt: 1 };
+        break;
+      case "free":
+        searchQuery.isFree = true;
+        sortOption = { createdAt: -1 };
+        break;
+      case "cheapest":
+        sortOption = { price: 1 };
+        break;
+      case "most-expensive":
+        sortOption = { price: -1 };
+        break;
+      default:
+        sortOption = { createdAt: -1 };
+        break;
+    }
+
     const allEvents = await Event.find(searchQuery)
-      .sort({ createdAt: "desc" })
+      .sort(sortOption)
       .skip(skip)
       .limit(limit)
       .populate({ path: "organizer", model: User })
       .populate({ path: "category", model: Category })
       .exec();
 
-    const totalEventsCount = await Event.countDocuments(searchQuery);
+    const totalEventsCount = await Event.countDocuments();
 
     const isNextPage = totalEventsCount > skip + allEvents.length;
 

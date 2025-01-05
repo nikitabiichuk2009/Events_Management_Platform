@@ -119,6 +119,9 @@ export async function getUserByClerkId(clerkId: string) {
   try {
     await connectToDB();
     const user = await User.findOne({ clerkId });
+    if (!user) {
+      throw new Error("User not found!");
+    }
     return user;
   } catch (error) {
     console.error("Error fetching user by clerkId:", error);

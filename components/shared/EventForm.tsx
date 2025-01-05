@@ -25,15 +25,23 @@ import "react-datepicker/dist/react-datepicker.css";
 import { uploadFiles } from "@/lib/uploadthing";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
-import { createEvent } from "@/lib/actions/events.actions";
+import { createEvent, updateEvent } from "@/lib/actions/events.actions";
 
 type EventFormProps = {
   userId: string;
+  eventIdToEdit?: string;
   type: "create" | "update";
   categories: { name: string }[];
+  initialValues?: z.infer<typeof eventSchema>;
 };
 
-const EventForm = ({ userId, type, categories }: EventFormProps) => {
+const EventForm = ({
+  userId,
+  eventIdToEdit,
+  type,
+  categories,
+  initialValues,
+}: EventFormProps) => {
   const minDate = new Date();
   const router = useRouter();
   const { toast } = useToast();
@@ -42,16 +50,16 @@ const EventForm = ({ userId, type, categories }: EventFormProps) => {
   const form = useForm<z.infer<typeof eventSchema>>({
     resolver: zodResolver(eventSchema),
     defaultValues: {
-      title: "",
-      description: "",
-      location: "",
-      url: "",
-      imageUrl: "",
-      price: 100,
-      category: "",
-      isFree: false,
-      startDateTime: undefined,
-      endDateTime: undefined,
+      title: initialValues?.title || "",
+      description: initialValues?.description || "",
+      location: initialValues?.location || "",
+      url: initialValues?.url || "",
+      imageUrl: initialValues?.imageUrl || "",
+      price: initialValues?.price || 100,
+      category: initialValues?.category || "",
+      isFree: initialValues?.isFree || false,
+      startDateTime: initialValues?.startDateTime || undefined,
+      endDateTime: initialValues?.endDateTime || undefined,
     },
   });
 
@@ -102,8 +110,8 @@ const EventForm = ({ userId, type, categories }: EventFormProps) => {
         router.push("/");
       }
     }
-    if (type === "create") {
-      try {
+    try {
+      if (type === "create") {
         await createEvent({
           userId,
           event: {
@@ -112,22 +120,37 @@ const EventForm = ({ userId, type, categories }: EventFormProps) => {
           },
           path: "/",
         });
-        setIsSubmitting(false);
-        router.push("/");
         toast({
           title: "Event created successfully",
           description: "Your event has been created",
           className: "bg-green-500 text-white border-none",
         });
-      } catch (error) {
-        setIsSubmitting(false);
-        router.push("/");
+      } else if (type === "update" && eventIdToEdit) {
+        await updateEvent({
+          userId,
+          event: {
+            _id: eventIdToEdit,
+            ...values,
+            imageUrl: uploadImageUrl,
+          },
+          path: `/events/${eventIdToEdit}`,
+        });
         toast({
-          title: "Event creation failed",
-          description: "Please try again later",
-          className: "bg-red-500 text-white border-none",
+          title: "Event updated successfully",
+          description: "Your event has been updated",
+          className: "bg-green-500 text-white border-none",
         });
       }
+      router.push("/");
+    } catch (error) {
+      toast({
+        title: `Event ${type === "create" ? "creation" : "update"} failed`,
+        description: "Please try again later",
+        className: "bg-red-500 text-white border-none",
+      });
+      router.push("/");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 

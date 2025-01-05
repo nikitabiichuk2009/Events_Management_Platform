@@ -10,9 +10,9 @@ type Props = {
 
 const CategoryCard = ({ id, name, eventCount }: Props) => {
   return (
-    <div className="shadow-sm w-full md:w-[260px]">
+    <div className="w-full md:w-[260px] bg-white">
       <Link href={`/categories/${id}`}>
-        <div className="background-light850_dark200 light-border flex h-[150px] flex-col justify-start gap-[18px] rounded-2xl border p-8 dark:border-none">
+        <div className="flex h-[150px] flex-col justify-start shadow-lg gap-[18px] rounded-2xl border p-8">
           <Badge className= "w-fit rounded-md border-none px-4 py-2 text-white bg-primary-400">
             {name}
           </Badge>

@@ -21,11 +21,15 @@ export const metadata: Metadata = {
   },
 };
 
-const EventPage = async ({ params }: { params: Promise<SearchParamsProps> }) => {
+const EventPage = async ({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) => {
   const resolvedParams = await params;
   const eventId = resolvedParams.id || "";
   if (!eventId) {
-    redirect("/")
+    redirect("/");
   }
   let event;
   let user;
@@ -51,7 +55,6 @@ const EventPage = async ({ params }: { params: Promise<SearchParamsProps> }) => 
   try {
     const unParsedEvent = await getEventById(eventId);
     event = stringifyObject(unParsedEvent);
-    console.log(event);
   } catch (err) {
     console.error(err);
     return (
@@ -104,8 +107,11 @@ const EventPage = async ({ params }: { params: Promise<SearchParamsProps> }) => 
                   </Link>
                 </div>
                 <p className="p-medium-18 ml-2 mt-2 sm:mt-0">
-                  by {event.organizer.firstName} {event.organizer.lastName} | @
-                  {event.organizer.username}
+                  by{" "}
+                  <span className="text-grey-500">
+                    {event.organizer.firstName} {event.organizer.lastName} | @
+                    {event.organizer.username}
+                  </span>{" "}
                 </p>
               </div>
             </div>
@@ -119,8 +125,8 @@ const EventPage = async ({ params }: { params: Promise<SearchParamsProps> }) => 
                   height={32}
                 />
                 <p className="p-medium-16 md:p-medium-18">
-                  {formatDateTime(new Date(event.startDateTime))} -{" "}
-                  {formatDateTime(new Date(event.endDateTime))}
+                  {formatDateTime(event.startDateTime)} -{" "}
+                  {formatDateTime(event.endDateTime)}
                 </p>
               </div>
               <div className="flex gap-2 md:gap-3 items-center">
@@ -132,18 +138,26 @@ const EventPage = async ({ params }: { params: Promise<SearchParamsProps> }) => 
                 />
                 <p className="p-medium-16 md:p-medium-18">{event.location}</p>
               </div>
+              <Link
+                href={event.url}
+                className="flex gap-2 md:gap-3 items-center"
+              >
+                <Image
+                  src="/assets/icons/link.svg"
+                  alt="link"
+                  width={28}
+                  height={28}
+                />
+                <p className="p-medium-16 md:p-medium-18 text-primary-400 hover:text-primary-500 ease-in-out duration-300 transition-colors">
+                  {event.url}
+                </p>
+              </Link>
             </div>
             <Separator />
             <div className="flex flex-col gap-2">
               <p className="p-regular-16 md:p-regular-18 font-spaceGrotesk line-clamp-4">
                 {event.description}
               </p>
-              <Link
-                href={event.url}
-                className="p-regular-16 md:p-regular-18 text-primary-500 hover:text-primary-400 ease-in-out duration-300 transition-colors"
-              >
-                View Info about the Event
-              </Link>
             </div>
           </div>
         </div>

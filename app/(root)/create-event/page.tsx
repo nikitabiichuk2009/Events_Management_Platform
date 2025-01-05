@@ -75,7 +75,7 @@ export default async function CreateEventPage() {
       </section>
       <div className="wrapper my-8">
         <EventForm
-          userId={mongoUser._id}
+          userId={mongoUser?._id || ""}
           type="create"
           categories={categories}
         />

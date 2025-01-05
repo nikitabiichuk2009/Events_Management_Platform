@@ -1,3 +1,7 @@
+import { ICategory } from "@/lib/database/models/category.model"
+import { IEvent } from "@/lib/database/models/event.model"
+import { IUser } from "@/lib/database/models/user.model"
+
 // ====== USER PARAMS
 export type CreateUserParams = {
   clerkId: string
@@ -66,8 +70,8 @@ export type UpdateEventParams = {
     location: string
     startDateTime: Date
     endDateTime: Date
-    categoryId: string
-    price: string
+    category: string
+    price: number
     isFree: boolean
     url: string
   }
@@ -99,27 +103,7 @@ export type GetRelatedEventsByCategoryParams = {
   page: number | string
 }
 
-export type Event = {
-  _id: string
-  title: string
-  description: string
-  price: string
-  isFree: boolean
-  imageUrl: string
-  location: string
-  startDateTime: Date
-  endDateTime: Date
-  url: string
-  organizer: {
-    _id: string
-    firstName: string
-    lastName: string
-  }
-  category: {
-    _id: string
-    name: string
-  }
-}
+export type Event = IEvent & { _id: string } & { organizer: IUser & { _id: string } } & { category: ICategory & { _id: string } };
 
 // ====== CATEGORY PARAMS
 export type GetAllCategoriesParams = {

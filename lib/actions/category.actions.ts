@@ -16,7 +16,7 @@ export async function getAllCategories(params: GetAllCategoriesParams): Promise<
     let sortOption = {};
     switch (filter) {
       case "popular":
-        sortOption = { questionsCount: -1 };
+        sortOption = { followers: -1 };
         break;
       case "recent":
         sortOption = { createdAt: -1 };

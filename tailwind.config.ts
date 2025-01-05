@@ -74,6 +74,7 @@ module.exports = withUt({
       backgroundImage: {
         'dotted-pattern': "url('/assets/images/dotted-pattern.png')",
         'hero-img': "url('/assets/images/hero.png')",
+        'escheresque-pattern': "url('https://www.transparenttextures.com/patterns/escheresque.png')",
       },
       borderRadius: {
         lg: 'var(--radius)',
