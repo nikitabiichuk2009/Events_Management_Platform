@@ -10,7 +10,7 @@ type EventsCollectionProps = {
   emptyButtonTitle: string;
   emptyButtonHref: string;
   data: Event[];
-  collectionType: "All_Events" | "Events_Organized" | "My_Tickets";
+  collectionType: "All_Events" | "Events_Organized" | "All_Tickets";
 };
 
 const EventsCollection = async ({
@@ -26,7 +26,8 @@ const EventsCollection = async ({
     <ul className="flex flex-wrap gap-8 items-center max-md:justify-center mt-12">
       {data.map((event: Event) => {
         const hasOrderLink = collectionType === "Events_Organized";
-        const hidePrice = collectionType === "My_Tickets";
+        const hidePrice =
+          collectionType === "All_Tickets" && userId === event.organizer._id;
         return (
           <li key={event._id} className="m-0 p-0">
             <EventCard

@@ -15,13 +15,24 @@ export type CreateUserParams = {
 export type UpdateUserParams = {
   clerkId: string
   updateData: {
-    firstName: string
-    lastName: string
-    username: string
-    email: string
-    photo: string
+    firstName?: string
+    lastName?: string
+    username?: string
+    email?: string
+    photo?: string
+    bio?: string
+    location?: string
+    personalWebsite?: string
   }
   path: string
+}
+
+export type GetEventsByUserParams = {
+  userId: string
+  limit?: number
+  page: number
+  query?: string
+  category?: string
 }
 
 export type DeleteUserParams = {
@@ -88,12 +99,6 @@ export type GetAllEventsParams = {
   category?: string
   limit?: number
   page?: number
-}
-
-export type GetEventsByUserParams = {
-  userId: string
-  limit?: number
-  page: number
 }
 
 export type GetSavedEventsByUserParams = {
@@ -169,8 +174,8 @@ export type RemoveUrlQueryParams = {
 }
 
 export type SearchParamProps = {
-  params: { id: string }
-  searchParams: { [key: string]: string | string[] | undefined }
+  params: Promise<{ id: string }>
+  searchParams: Promise<SearchParamsProps>
 }
 
 export interface SearchParamsProps {

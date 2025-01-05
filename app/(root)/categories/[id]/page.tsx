@@ -8,7 +8,7 @@ import Filter from "@/components/shared/Filter";
 import Pagination from "@/components/shared/Pagination";
 import NoResults from "@/components/shared/NoResults";
 import { EventFilters } from "@/constants";
-import { SearchParamsProps } from "@/types";
+import { SearchParamProps } from "@/types";
 import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
@@ -22,10 +22,7 @@ export const metadata: Metadata = {
 export default async function CategoryPage({
   params,
   searchParams,
-}: {
-  params: Promise<{ id: string }>;
-  searchParams: Promise<SearchParamsProps>;
-}) {
+}: SearchParamProps) {
   const resolvedSearchParams = await searchParams;
   const resolvedParams = await params;
   const categoryId = resolvedParams.id;

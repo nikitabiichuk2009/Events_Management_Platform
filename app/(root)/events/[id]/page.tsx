@@ -10,13 +10,14 @@ import { Separator } from "@/components/ui/separator";
 import { auth } from "@clerk/nextjs/server";
 import { getUserByClerkId } from "@/lib/actions/user.actions";
 import EventDetailsHeaderCard from "@/components/shared/cards/EventDetailsCard";
-import { SearchParamsProps } from "@/types";
+import { Event, SearchParamProps } from "@/types";
 import { redirect } from "next/navigation";
 import Pagination from "@/components/shared/Pagination";
 import EventsCollection from "@/components/shared/EventsCollection";
 import { EventFilters } from "@/constants";
 import Filter from "@/components/shared/Filter";
 import SearchBar from "@/components/shared/SearchBar";
+import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
   title: "Evently | Event Details",
@@ -29,10 +30,7 @@ export const metadata: Metadata = {
 export default async function EventPage({
   params,
   searchParams,
-}: {
-  params: Promise<{ id: string }>;
-  searchParams: Promise<SearchParamsProps>;
-}) {
+}: SearchParamProps) {
   const resolvedParams = await params;
   const resolvedSearchParams = await searchParams;
   const searchQuery = resolvedSearchParams.query || "";
@@ -52,7 +50,7 @@ export default async function EventPage({
   const { userId } = await auth();
   try {
     if (!userId) return;
-    const unParsedUser = await getUserByClerkId(userId);
+    const unParsedUser = await getUserByClerkId(userId, true);
     user = stringifyObject(unParsedUser);
   } catch (err) {
     console.error(err);
@@ -85,22 +83,25 @@ export default async function EventPage({
       </div>
     );
   }
-  try {
-    const unParsedRelatedEvents = await getRelatedEvents({
-      categoryId: event.category._id,
-      currentEventId: event._id,
-      query: searchQuery,
-      category: filter,
-      page,
-      limit: 10,
-    });
-    const parsedEvents = stringifyObject(unParsedRelatedEvents);
-    relatedEvents = parsedEvents.events;
-    isNext = parsedEvents.isNext;
-  } catch (err) {
-    console.error(err);
-    hasErrorOccurredDuringLoadingRelatedEvents = true;
+  if (event && event.category?._id) {
+    try {
+      const unParsedRelatedEvents = await getRelatedEvents({
+        categoryId: event.category._id,
+        currentEventId: event._id,
+        query: searchQuery,
+        category: filter,
+        page,
+        limit: 10,
+      });
+      const parsedEvents = stringifyObject(unParsedRelatedEvents);
+      relatedEvents = parsedEvents.events;
+      isNext = parsedEvents.isNext;
+    } catch (err) {
+      console.error(err);
+      hasErrorOccurredDuringLoadingRelatedEvents = true;
+    }
   }
+  const areTicketsAvailable = new Date(event.endDateTime) > new Date();
 
   return (
     <>
@@ -121,6 +122,13 @@ export default async function EventPage({
                 userClerkId={userId || ""}
                 eventId={event._id}
               />
+              {areTicketsAvailable ? (
+                <Button className="md:w-fit">{event.isFree ? "Get Ticket" : `Buy Ticket`}</Button>
+              ) : (
+                <p className="p-regular-16 font-spaceGrotesk text-red-400">
+                  Tickets are no longer available for this event.
+                </p>
+              )}
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                 <div className="flex gap-3 items-center">
                   <p
@@ -138,13 +146,15 @@ export default async function EventPage({
                     </Badge>
                   </Link>
                 </div>
-                <p className="p-medium-16 xl:p-medium-18 ml-2 mt-2 sm:mt-0">
-                  by{" "}
-                  <span className="text-grey-500">
-                    {event.organizer.firstName} {event.organizer.lastName} | @
-                    {event.organizer.username}
-                  </span>{" "}
-                </p>
+                <Link href={`/profile/${event.organizer.clerkId}`}>
+                  <p className="p-medium-16 xl:p-medium-18 ml-2 mt-2 sm:mt-0">
+                    by{" "}
+                    <span className="text-grey-500">
+                      {event.organizer.firstName} {event.organizer.lastName} | @
+                      {event.organizer.username}
+                    </span>{" "}
+                  </p>
+                </Link>
               </div>
             </div>
             {/* CHECKOUT BUTTON */}
@@ -174,6 +184,7 @@ export default async function EventPage({
               </div>
               <Link
                 href={event.url}
+                target="_blank"
                 className="flex gap-2 md:gap-3 items-center"
               >
                 <Image

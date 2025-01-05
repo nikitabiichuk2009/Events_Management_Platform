@@ -4,11 +4,12 @@ import { revalidatePath } from "next/cache";
 import { connectToDB } from "../database";
 import User, { IUser } from "../database/models/user.model";
 import Order from "../database/models/order.model";
-import Category, { ICategory } from "../database/models/category.model";
+import Category from "../database/models/category.model";
 import Event, { IEvent } from "../database/models/event.model";
-import { CreateUserParams, DeleteUserParams, GetSavedEventsByUserParams, GetUserStatsParams, SaveEventParams, UpdateUserParams } from "@/types";
-import mongoose from "mongoose";
+import { CreateUserParams, DeleteUserParams, GetEventsByUserParams, GetSavedEventsByUserParams, SaveEventParams, UpdateUserParams } from "@/types";
 import { FilterQuery } from "mongoose";
+import { stringifyObject } from '@/lib/utils';
+import mongoose from "mongoose";
 
 export async function createUser(userData: CreateUserParams): Promise<IUser> {
   await connectToDB();
@@ -36,7 +37,8 @@ export async function updateUser(userData: UpdateUserParams): Promise<IUser> {
     );
     revalidatePath("/");
     revalidatePath(path);
-    return updatedUser;
+
+    return stringifyObject(updatedUser);
   } catch (err) {
     console.error("Error updating user:", err);
     throw new Error("Error updating user");
@@ -81,47 +83,97 @@ export async function deleteUser(userData: DeleteUserParams): Promise<IUser> {
   }
 }
 
-export async function getUserCategories(params: GetUserStatsParams): Promise<{ categories: ICategory[], isNext: boolean }> {
+export async function getUserCategories(userId: string): Promise<{ name: string; id: string }[]> {
   try {
     await connectToDB();
-    const { userId, page = 1, pageSize = 10 } = params;
-    const skip = (page - 1) * pageSize;
     const userObjectId = new mongoose.Types.ObjectId(userId);
-
-    const categories = await Category.aggregate([
+    const categoriesResult = await Category.aggregate([
       { $match: { followers: userObjectId } },
       {
-        $addFields: {
-          eventsCount: { $size: "$events" },
+        $project: {
+          _id: 0,
+          name: 1,
         },
       },
-      {
-        $sort: { eventsCount: -1 },
-      },
-      {
-        $skip: skip,
-      },
-      {
-        $limit: pageSize,
-      },
     ]);
-
-    const totalUserCategories = await Category.countDocuments({ followers: userObjectId });
-    const hasNextPage = totalUserCategories > skip + categories.length;
-
-    return { categories, isNext: hasNextPage };
+    const categories = categoriesResult.map((category: { name: string, _id: string }) => ({
+      name: category.name,
+      id: category._id,
+    }));
+    return categories;
   } catch (error) {
     console.error("Error fetching user categories:", error);
     throw new Error("Error fetching user categories");
   }
 }
 
-export async function getUserByClerkId(clerkId: string) {
+export async function getUserOrganizedEvents({
+  userId,
+  query = "",
+  category = "",
+  page = 1,
+  limit = 10,
+}: GetEventsByUserParams): Promise<{ events: Event[]; isNextPage: boolean }> {
+  try {
+    await connectToDB();
+
+    const skip = (page - 1) * limit;
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+    const searchQuery: FilterQuery<IEvent> = { organizer: userObjectId };
+
+    if (query) {
+      searchQuery.title = { $regex: query, $options: "i" };
+    }
+
+    let sortOption = {};
+    switch (category) {
+      case "popular":
+        sortOption = { savedCount: -1 };
+        break;
+      case "recent":
+        sortOption = { createdAt: -1 };
+        break;
+      case "free":
+        searchQuery.isFree = true;
+        sortOption = { createdAt: -1 };
+        break;
+      case "cheapest":
+        sortOption = { price: 1 };
+        break;
+      case "most-expensive":
+        sortOption = { price: -1 };
+        break;
+      default:
+        sortOption = { createdAt: -1 };
+        break;
+    }
+
+    const events = await Event.find(searchQuery)
+      .sort(sortOption)
+      .skip(skip)
+      .limit(limit)
+      .populate({ path: "category", model: Category })
+      .populate({ path: "organizer", model: User });
+
+    const totalCount = await Event.countDocuments(searchQuery);
+    const isNextPage = totalCount > skip + events.length;
+
+    return { events, isNextPage };
+  } catch (err) {
+    console.error("Error fetching organized events:", err);
+    throw new Error("Error fetching organized events");
+  }
+}
+
+export async function getUserByClerkId(clerkId: string, shouldPopulateSavedEvents: boolean) {
   try {
     await connectToDB();
     const user = await User.findOne({ clerkId });
     if (!user) {
       throw new Error("User not found!");
+    }
+    if (shouldPopulateSavedEvents) {
+      user.populate({ path: "savedEvents", model: Event });
     }
     return user;
   } catch (error) {

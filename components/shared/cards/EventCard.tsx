@@ -174,8 +174,7 @@ export default function EventCard({
           <div className="flex flex-col gap-2">
             <CardItem
               as={Link}
-              href="https://twitter.com/mannupaaji"
-              target="_blank"
+              href={`/profile/${event.organizer.clerkId}`}
               className="px-4 py-2 rounded-xl text-sm font-normal text-grey-500"
             >
               {event.organizer.firstName} {event.organizer.lastName} | @

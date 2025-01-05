@@ -12,3 +12,24 @@ export const eventSchema = z.object({
   startDateTime: z.date({ message: "Start date and time is required" }),
   endDateTime: z.date({ message: "End date and time is required" }),
 });
+
+export const profileSchema = z.object({
+  bio: z
+    .string()
+    .optional()
+    .refine((val) => !val || (val.length >= 10 && val.length <= 300), {
+      message: "Bio must be between 10 and 300 characters long",
+    }),
+  personalWebsite: z
+    .string()
+    .optional()
+    .refine((val) => !val || /^https?:\/\/[^\s/$.?#].[^\s]*$/.test(val), {
+      message: "Personal website must be a valid URL",
+    }),
+  location: z
+    .string()
+    .optional()
+    .refine((val) => !val || val.length >= 3 && val.length <= 150, {
+      message: "Location must be between 3 and 150 characters long",
+    }),
+});

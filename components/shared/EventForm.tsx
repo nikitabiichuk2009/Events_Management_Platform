@@ -184,7 +184,7 @@ const EventForm = ({
                   />
                 </FormControl>
                 <FormDescription className="form-description">
-                  This is the title of your event.
+                  This is the title of your event (3-40 characters).
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -205,7 +205,7 @@ const EventForm = ({
                   />
                 </FormControl>
                 <FormDescription className="form-description">
-                  This is the category of your event.
+                  This is the category of your event (3-35 characters).
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -227,7 +227,7 @@ const EventForm = ({
                 />
               </FormControl>
               <FormDescription className="form-description">
-                This is the description of your event.
+                This is the description of your event (10-400 characters).
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -277,7 +277,7 @@ const EventForm = ({
                 </div>
               </FormControl>
               <FormDescription className="form-description">
-                This is the location of your event.
+                This is the location of your event (3-150 characters).
               </FormDescription>
               <FormMessage />
             </FormItem>

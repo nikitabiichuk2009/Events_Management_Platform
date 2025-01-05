@@ -25,7 +25,7 @@ export default async function CreateEventPage() {
     redirect("/sign-in");
   }
   try {
-    const user = await getUserByClerkId(userId);
+    const user = await getUserByClerkId(userId, false);
     mongoUser = stringifyObject(user);
   } catch (err) {
     console.log(err);
