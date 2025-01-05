@@ -149,7 +149,7 @@ export async function updateEvent({
 
 export async function getAllEvents({
   query = "",
-  category = "", // Accepted but not processed for now
+  category = "",
   limit = 10,
   page = 1,
 }: GetAllEventsParams): Promise<{
@@ -264,10 +264,75 @@ export async function deleteEventById(eventId: string): Promise<void> {
     revalidatePath("/saved")
     revalidatePath("/")
     revalidatePath(`/categories/${event.category._id.toString()}`)
+    revalidatePath(`/events/${event._id.toString()}`)
 
     console.log(`Event with ID ${eventId} deleted successfully.`);
   } catch (error) {
     console.error("Error deleting event:", error);
     throw new Error("Error deleting event");
+  }
+}
+
+export async function getRelatedEvents({
+  categoryId,
+  currentEventId,
+  query = "",
+  category = "",
+  page = 1,
+  limit = 10,
+}: GetAllEventsParams & { categoryId: string; currentEventId: string }): Promise<{
+  events: Event[];
+  isNext: boolean;
+}> {
+  try {
+    await connectToDB();
+
+    const skip = (page - 1) * limit;
+    const searchQuery: any = {
+      category: categoryId,
+      _id: { $ne: currentEventId }, // Exclude the current event
+    };
+
+    if (query) {
+      searchQuery.title = { $regex: query, $options: "i" };
+    }
+
+    let sortOption = {};
+    switch (category) {
+      case "popular":
+        sortOption = { savedCount: -1 };
+        break;
+      case "recent":
+        sortOption = { createdAt: -1 };
+        break;
+      case "free":
+        searchQuery.isFree = true;
+        sortOption = { createdAt: -1 };
+        break;
+      case "cheapest":
+        sortOption = { price: 1 };
+        break;
+      case "most-expensive":
+        sortOption = { price: -1 };
+        break;
+      default:
+        sortOption = { createdAt: -1 };
+        break;
+    }
+    const events = await Event.find(searchQuery)
+      .sort(sortOption)
+      .skip(skip)
+      .limit(limit)
+      .populate({ path: "organizer", model: User })
+      .populate({ path: "category", model: Category })
+      .exec();
+
+    const totalCount = await Event.countDocuments(searchQuery);
+    const isNextPage = totalCount > skip + events.length;
+
+    return { events, isNext: isNextPage };
+  } catch (err) {
+    console.error("Error fetching related events:", err);
+    throw new Error("Error fetching related events");
   }
 }

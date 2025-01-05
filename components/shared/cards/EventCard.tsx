@@ -54,7 +54,7 @@ export default function EventCard({
   }
   return (
     <CardContainer className="shadow-lg rounded-xl overflow-hidden">
-      <CardBody className="bg-primary-50 relative group/card border-black/[0.1] w-auto sm:w-[25rem] h-auto rounded-xl p-6 border">
+      <CardBody className="bg-primary-50 relative group/card border-black/[0.1] h-[32rem] w-[25rem] rounded-xl p-6 border">
         <CardItem
           className="text-lg font-bold text-neutral-600 dark:text-white flex flex-row gap-4 items-center"
           as={"div"}
@@ -154,7 +154,7 @@ export default function EventCard({
           <div className="flex gap-3 items-center mt-4">
             {!hidePrice && (
               <p
-                className={`p-bold-16 font-spaceGrotesk rounded-full px-5 py-2 ${
+                className={`p-bold-16 font-spaceGrotesk rounded-full px-5 py-2 line-clamp-1 ${
                   event.isFree
                     ? "text-green-500 bg-green-500/10"
                     : "text-primary-400 bg-primary-500/10"
@@ -164,7 +164,7 @@ export default function EventCard({
               </p>
             )}
             <Link href={`/events?category=${event.category._id}`}>
-              <Badge className="w-fit border-none px-4 py-2 text-white bg-primary-400 rounded-full cursor-pointer">
+              <Badge className="w-fit border-none px-4 py-2 text-white bg-primary-400 rounded-full cursor-pointer line-clamp-1">
                 {event.category.name}
               </Badge>
             </Link>

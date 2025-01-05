@@ -23,12 +23,12 @@ const EventsCollection = async ({
 }: EventsCollectionProps) => {
   const { userId } = await auth();
   return data.length > 0 ? (
-    <ul className="flex flex-wrap gap-1 lg:gap-5">
+    <ul className="flex flex-wrap gap-8 items-center max-md:justify-center mt-12">
       {data.map((event: Event) => {
         const hasOrderLink = collectionType === "Events_Organized";
         const hidePrice = collectionType === "My_Tickets";
         return (
-          <li key={event._id}>
+          <li key={event._id} className="m-0 p-0">
             <EventCard
               event={event}
               hasOrderLink={hasOrderLink}

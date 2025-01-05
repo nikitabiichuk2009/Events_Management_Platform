@@ -47,7 +47,7 @@ export default async function Home({
     const parsedResult = stringifyObject(result);
     events = parsedResult.allEvents;
     eventsCount = parsedResult.totalEventsCount;
-    isNext = parsedResult.isNext;
+    isNext = parsedResult.isNextPage;
   } catch (err) {
     console.log(err);
     return (
@@ -91,7 +91,7 @@ export default async function Home({
           </div>
         </div>
       </section>
-      <section id="events" className="wrapper my-8 flex-col gap-8 md:gap-12">
+      <section id="events" className="wrapper my-8 flex-col flex">
         <h2 className="h2-bold">
           Trusted by <span className="text-primary-500">{eventsCount}</span>{" "}
           <br /> of Events
@@ -118,7 +118,7 @@ export default async function Home({
           emptyButtonHref="/create-event"
         />
         <div className="mt-10">
-          <Pagination pageNumber={page} isNext={isNext} />
+          <Pagination pageNumber={page} isNext={isNext} section="events" />
         </div>
       </section>
     </>

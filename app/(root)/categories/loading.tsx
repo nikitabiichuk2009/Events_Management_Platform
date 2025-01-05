@@ -14,14 +14,14 @@ const CategoriesLoading = () => {
       </section>
       <section className="wrapper">
         <div className="mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center">
-          <Skeleton className="h-14 w-full" />
-          <Skeleton className="min-h-14 sm:min-w-[170px]" />
+          <Skeleton className="h-14 w-full rounded-xl" />
+          <Skeleton className="min-h-14 sm:min-w-[170px] rounded-md" />
         </div>
-        <div className="mt-12 flex flex-wrap gap-4">
-          {Array.from({ length: 10 }).map((_, idx) => (
+        <div className="mt-12 flex flex-wrap gap-5 2xl:gap-8 items-center max-md:justify-center">
+          {Array.from({ length: 3 }).map((_, idx) => (
             <Skeleton
               key={idx}
-              className="h-[150px] w-full rounded-2xl md:w-[260px]"
+              className="h-[32rem] w-[25rem] rounded-xl"
             />
           ))}
         </div>

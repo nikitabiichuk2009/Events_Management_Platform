@@ -7,9 +7,11 @@ import { Button } from "../ui/button";
 const Pagination = ({
   pageNumber,
   isNext,
+  section,
 }: {
   pageNumber: number;
   isNext: boolean;
+  section?: string;
 }) => {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -26,7 +28,7 @@ const Pagination = ({
       key: "page",
       value: nextpageNumber.toString(),
     });
-    router.push(newUrl);
+    router.push(section ? `${newUrl}#${section}` : newUrl);
 
     setTimeout(() => {
       setIsDisabled(false);
@@ -42,7 +44,7 @@ const Pagination = ({
       >
         <p className="text-body-semibold text-light-1">Prev</p>
       </Button>
-      <div className="flex items-center justify-center text-white rounded-md bg-primary-500/100 p-3.5 py-2">
+      <div className="flex items-center justify-center text-white rounded-md bg-[#7E5CAD] p-3.5 py-2">
         <p className="text-body-semibold text-light-2">{pageNumber}</p>
       </div>
       <Button

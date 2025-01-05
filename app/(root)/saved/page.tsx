@@ -50,7 +50,7 @@ export default async function SavedEventsPage({
     });
     const parsedResult = stringifyObject(result);
     savedEvents = parsedResult.savedEvents;
-    isNext = parsedResult.isNext;
+    isNext = parsedResult.isNextPage;
   } catch (error) {
     console.error("Error fetching saved events:", error);
     return (
@@ -96,7 +96,7 @@ export default async function SavedEventsPage({
           emptyTitle="No saved events found"
           emptyDescription="You don't have any saved events. Explore events and save them!"
           emptyButtonTitle="Explore Events"
-          emptyButtonHref="/"
+          emptyButtonHref="/#events"
         />
         <div className="mt-10">
           <Pagination pageNumber={page} isNext={isNext} />

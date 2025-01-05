@@ -15,13 +15,13 @@ export default function CategoryPageLoading() {
 
       <section className="wrapper">
         <div className="mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center">
-          <Skeleton className="h-14 w-full rounded-md" />
+          <Skeleton className="h-14 w-full rounded-xl" />
           <Skeleton className="h-14 sm:w-[170px] rounded-md" />
         </div>
 
-        <div className="mt-8 flex flex-wrap gap-4">
+        <div className="mt-12 flex flex-wrap gap-5 2xl:gap-8 items-center max-md:justify-center">
           {Array.from({ length: 3 }).map((_, idx) => (
-            <Skeleton key={idx} className="h-96 w-96 rounded-xl sm:w-[25rem]" />
+            <Skeleton key={idx} className="h-[32rem] w-[25rem] rounded-xl" />
           ))}
         </div>
 

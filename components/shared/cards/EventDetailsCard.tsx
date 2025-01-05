@@ -46,8 +46,8 @@ export default function EventDetailsHeaderCard({
   };
 
   return (
-    <div className="flex gap-6 items-center">
-      <h2 className="h2-bold">{eventTitle}</h2>
+    <div className="flex gap-4 xl:gap-6 items-center">
+      <h2 className="h2-for-event-details line-clamp-2">{eventTitle}</h2>
       <Image
         src={
           hasSaved

@@ -63,6 +63,9 @@ const EventForm = ({
     },
   });
 
+  const isFormUnchanged =
+    type === "update" && Object.keys(form.formState.dirtyFields).length === 0;
+
   const onSubmit = async (values: z.infer<typeof eventSchema>) => {
     if (isSubmitting) return;
     if (
@@ -125,7 +128,8 @@ const EventForm = ({
           description: "Your event has been created",
           className: "bg-green-500 text-white border-none",
         });
-      } else if (type === "update" && eventIdToEdit) {
+        router.push("/");
+      } else if (type === "update" && eventIdToEdit && !isFormUnchanged) {
         await updateEvent({
           userId,
           event: {
@@ -140,8 +144,8 @@ const EventForm = ({
           description: "Your event has been updated",
           className: "bg-green-500 text-white border-none",
         });
+        router.push(`/events/${eventIdToEdit}`);
       }
-      router.push("/");
     } catch (error) {
       toast({
         title: `Event ${type === "create" ? "creation" : "update"} failed`,
@@ -447,7 +451,7 @@ const EventForm = ({
         <Button
           type="submit"
           className="w-full md:w-fit"
-          disabled={isSubmitting}
+          disabled={isSubmitting || (type === "update" && isFormUnchanged)}
           size="lg"
         >
           {isSubmitting ? "Submitting..." : "Submit"}

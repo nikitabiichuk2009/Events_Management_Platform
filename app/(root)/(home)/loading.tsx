@@ -18,18 +18,18 @@ export default function HomeLoading() {
         </div>
       </section>
 
-      <section id="events" className="wrapper my-8 flex-col gap-8 md:gap-12">
+      <section id="events" className="wrapper my-8 flex-col flex">
         <h2 className="h2-bold">Loading Events...</h2>
         <p className="p-regular-16 md:p-regular-18 xl:p-regular-20 text-primary-400 font-spaceGrotesk">
           Please wait while we load the events for you.
         </p>
         <div className="mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center">
-          <Skeleton className="h-14 w-full rounded-md" />
+          <Skeleton className="h-14 w-full rounded-xl" />
           <Skeleton className="h-14 sm:w-[170px] rounded-md" />
         </div>
-        <div className="mt-12 flex flex-wrap gap-4">
+        <div className="mt-12 flex flex-wrap gap-5 2xl:gap-8 items-center max-md:justify-center">
           {Array.from({ length: 3 }).map((_, idx) => (
-            <Skeleton key={idx} className="h-96 w-96 rounded-xl sm:w-[25rem]" />
+            <Skeleton key={idx} className="h-[32rem] w-[25rem] rounded-xl" />
           ))}
         </div>
         <div className="mt-10 flex w-full items-center justify-center gap-2">
