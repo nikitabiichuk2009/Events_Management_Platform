@@ -32,6 +32,7 @@ export async function POST(request: Request) {
       totalAmount: amount_total ? parseFloat(amount_total.toString()) / 100 : 0,
       createdAt: new Date(),
     }
+    console.log(order)
 
     const newOrder = await createOrder(order)
     return NextResponse.json({ message: 'OK', order: newOrder })
