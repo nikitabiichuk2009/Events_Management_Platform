@@ -1,23 +1,13 @@
 import stripe from 'stripe'
 import { NextResponse } from 'next/server'
 import { createOrder } from '@/lib/actions/order.actions'
-import { buffer } from '@/lib/utils';
-import { NextApiRequest } from 'next';
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
-export async function POST(request: NextApiRequest) {
-  const body = await buffer(request);
+export async function POST(request: Request) {
+  const body = await request.text()
   console.log('body', body)
 
-  const sig = request.headers["stripe-signature"]!;
-  console.log('sig', sig)
+  const sig = request.headers.get('stripe-signature') as string
   const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!
-  console.log('endpointSecret', endpointSecret)
 
   let event
 
@@ -31,11 +21,10 @@ export async function POST(request: NextApiRequest) {
 
   // Get the ID and type
   const eventType = event.type
-  console.log('eventType', eventType)
+
   // CREATE
   if (eventType === 'checkout.session.completed') {
     const { id, amount_total, metadata } = event.data.object
-    console.log('event.data.object', event.data.object)
 
     const order = {
       stripeId: id,
