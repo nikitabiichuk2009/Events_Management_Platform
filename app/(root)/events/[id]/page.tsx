@@ -10,14 +10,14 @@ import { Separator } from "@/components/ui/separator";
 import { auth } from "@clerk/nextjs/server";
 import { getUserByClerkId } from "@/lib/actions/user.actions";
 import EventDetailsHeaderCard from "@/components/shared/cards/EventDetailsCard";
-import { Event, SearchParamProps } from "@/types";
+import { SearchParamProps } from "@/types";
 import { redirect } from "next/navigation";
 import Pagination from "@/components/shared/Pagination";
 import EventsCollection from "@/components/shared/EventsCollection";
 import { EventFilters } from "@/constants";
 import Filter from "@/components/shared/Filter";
 import SearchBar from "@/components/shared/SearchBar";
-import { Button } from "@/components/ui/button";
+import CheckoutButton from "@/components/shared/checkout/CheckoutButton";
 
 export const metadata: Metadata = {
   title: "Evently | Event Details",
@@ -122,13 +122,10 @@ export default async function EventPage({
                 userClerkId={userId || ""}
                 eventId={event._id}
               />
-              {areTicketsAvailable ? (
-                <Button className="md:w-fit">{event.isFree ? "Get Ticket" : `Buy Ticket`}</Button>
-              ) : (
-                <p className="p-regular-16 font-spaceGrotesk text-red-400">
-                  Tickets are no longer available for this event.
-                </p>
-              )}
+              <CheckoutButton
+                event={event}
+                user={{ clerkId: user.clerkId, userId: user._id }}
+              />
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                 <div className="flex gap-3 items-center">
                   <p
@@ -157,7 +154,6 @@ export default async function EventPage({
                 </Link>
               </div>
             </div>
-            {/* CHECKOUT BUTTON */}
             <div className="flex flex-col gap-5">
               <div className="flex gap-2 md:gap-3 items-center">
                 <Image
