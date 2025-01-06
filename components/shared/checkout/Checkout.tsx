@@ -10,7 +10,13 @@ import { useToast } from "@/hooks/use-toast";
 // recreating the `Stripe` object on every render.
 loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
-const Checkout = ({ event, user }: { event: Event; user: { clerkId: string; userId: string } }) => {
+const Checkout = ({
+  event,
+  user,
+}: {
+  event: Event;
+  user: { clerkId: string; userId: string };
+}) => {
   const router = useRouter();
   const { toast } = useToast();
   const onCheckout = async () => {
@@ -29,7 +35,8 @@ const Checkout = ({ event, user }: { event: Event; user: { clerkId: string; user
     } catch (error) {
       toast({
         title: "Error",
-        description: "Something went wrong while processing your order. Please try again.",
+        description:
+          "Something went wrong while processing your order. Please try again.",
         className: "bg-red-500 text-white border-none",
       });
     }
@@ -50,11 +57,14 @@ const Checkout = ({ event, user }: { event: Event; user: { clerkId: string; user
   }, []);
 
   return (
-    <form action={onCheckout} method="post">
-      <Button type="submit" role="link" className="w-full md:w-fit">
-        {event.isFree ? "Get Ticket" : `Buy Ticket`}
-      </Button>
-    </form>
+    <Button
+      type="submit"
+      role="link"
+      className="w-full md:w-fit"
+      onClick={onCheckout}
+    >
+      {event.isFree ? "Get Ticket" : `Buy Ticket`}
+    </Button>
   );
 };
 
