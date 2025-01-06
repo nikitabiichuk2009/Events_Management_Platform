@@ -101,7 +101,6 @@ export default async function EventPage({
       hasErrorOccurredDuringLoadingRelatedEvents = true;
     }
   }
-  const areTicketsAvailable = new Date(event.endDateTime) > new Date();
 
   return (
     <>
