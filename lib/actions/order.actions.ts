@@ -42,12 +42,14 @@ export async function checkoutOrder(order: CheckoutOrderParams) {
 export async function createOrder(order: CreateOrderParams) {
   try {
     await connectToDB();
+    console.log(order);
 
     const newOrder = await Order.create({
       ...order,
       event: order.eventId,
       buyer: order.buyerId,
     });
+    console.log(newOrder);
     return stringifyObject(newOrder);
   } catch (error) {
     console.error(error);
