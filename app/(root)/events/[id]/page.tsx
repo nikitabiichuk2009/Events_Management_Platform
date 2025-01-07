@@ -140,7 +140,7 @@ export default async function EventPage({
               />
               <CheckoutButton
                 event={event}
-                user={{ clerkId: user.clerkId, userId: user._id }}
+                user={{ clerkId: user.clerkId || "", userId: user._id || "" }}
                 userTickets={userTickets || []}
               />
               <div className="flex flex-col gap-3 sm:flex-row lg:flex-col 2xl:flex-row sm:items-center lg:items-start 2xl:items-center">
