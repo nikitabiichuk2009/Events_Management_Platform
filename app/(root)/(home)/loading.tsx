@@ -7,11 +7,11 @@ export default function HomeLoading() {
       <section className="bg-primary-400 bg-opacity-15 bg-escheresque-pattern">
         <div className="wrapper grid grid-cols-1 gap-5 md:grid-cols-2 2xl:gap-0">
           <div className="flex flex-col justify-center gap-8">
-            <Skeleton className="h-10 w-[70%] rounded-md" />
-            <div className="flex flex-col gap-1">
-              <Skeleton className="h-6 w-[90%] rounded-md" />
-              <Skeleton className="h-6 w-[90%] rounded-md" />
-            </div>
+            <h1 className="h1-bold">Loading Home page...</h1>
+            <p className="p-regular-16 md:p-regular-18 xl:p-regular-24 text-primary-400">
+              We're preparing your personalized event experience. Hang tight as
+              we load the platform for you.
+            </p>
             <Skeleton className="h-12 w-32 rounded-full" />
           </div>
           <Skeleton className="h-[70vh] 2xl:h-[50vh] w-full object-contain object-center" />
