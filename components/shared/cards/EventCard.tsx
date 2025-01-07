@@ -199,12 +199,12 @@ export default function EventCard({
               className="px-4 py-2 rounded-xl text-sm font-normal text-grey-500"
             >
               <div className="flex flex-row gap-2 items-center">
-                <div className="relative size-6 rounded-full overflow-hidden">
+                <div className="relative size-6 rounded-full">
                   <Image
                     src={event.organizer.photo!}
                     alt="Profile Image"
                     layout="fill"
-                    className="rounded-full object-cover shadow-lg"
+                    className="rounded-full object-cover"
                   />
                 </div>
                 @{event.organizer.username}

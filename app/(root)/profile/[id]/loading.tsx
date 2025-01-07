@@ -10,11 +10,13 @@ const ProfilePageLoading = () => {
       >
         <div className="flex items-center justify-between flex-col md:flex-row gap-4 md:gap-0">
           <div className="flex items-center gap-6">
-            <Skeleton className="size-36 md:size-48 rounded-full" />
+            <div className="relative size-36 md:size-48 rounded-full shadow-black shadow-sm">
+              <Skeleton className="rounded-full w-full h-full" />
+            </div>
             <div>
-              <h2 className="h2-bold">Loading Profile...</h2>
+              <h2 className="h2-bold">Please wait...</h2>
               <p className="p-regular-18 text-grey-400">
-                Please wait while we load user's profile.
+              Loading user profile...
               </p>
             </div>
           </div>

@@ -18,6 +18,7 @@ import { EventFilters } from "@/constants";
 import Filter from "@/components/shared/Filter";
 import SearchBar from "@/components/shared/SearchBar";
 import CheckoutButton from "@/components/shared/checkout/CheckoutButton";
+import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
   title: "Evently | Event Details",
@@ -138,11 +139,22 @@ export default async function EventPage({
                 userClerkId={userId || ""}
                 eventId={event._id}
               />
-              <CheckoutButton
-                event={event}
-                user={{ clerkId: user.clerkId || "", userId: user._id || "" }}
-                userTickets={userTickets || []}
-              />
+              {userId ? (
+                <CheckoutButton
+                  event={event}
+                  user={{
+                    clerkId: user?.clerkId || "",
+                    userId: user?._id || "",
+                  }}
+                  userTickets={userTickets || []}
+                />
+              ) : (
+                <Link href="/sign-in">
+                  <Button size="lg" className="w-full md:w-fit">
+                    Login to buy a ticket
+                  </Button>
+                </Link>
+              )}
               <div className="flex flex-col gap-3 sm:flex-row lg:flex-col 2xl:flex-row sm:items-center lg:items-start 2xl:items-center">
                 <div className="flex gap-3 items-center">
                   <p
@@ -164,7 +176,7 @@ export default async function EventPage({
                   <div className="p-medium-16 xl:p-medium-18 ml-2 mt-2 sm:mt-0">
                     <div className="flex items-center gap-2">
                       by{" "}
-                      <div className="relative size-6 md:size-8 lg:size-6 xl:size-8 2xl:size-10 rounded-full overflow-hidden">
+                      <div className="relative size-6 md:size-8 lg:size-6 xl:size-8 2xl:size-10 rounded-full">
                         <Image
                           src={event.organizer.photo}
                           alt="Organizer Image"

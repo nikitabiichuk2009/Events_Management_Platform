@@ -1,6 +1,7 @@
 import React from "react";
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetTitle,
   SheetTrigger,
@@ -34,7 +35,9 @@ const MobileNav = () => {
             />
           </SheetTitle>
           <Separator className="border" />
-          <NavItems />
+          <SheetClose asChild>
+            <NavItems />
+          </SheetClose>
           <SignedOut>
             <Button className="rounded-full w-fit mt-4">
               <Link href="/sign-in">Sign In</Link>

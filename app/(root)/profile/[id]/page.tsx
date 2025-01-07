@@ -141,12 +141,12 @@ export default async function ProfilePage({
       >
         <div className="flex items-center justify-between flex-col md:flex-row gap-4 md:gap-0">
           <div className="flex items-center gap-6">
-            <div className="relative size-36 md:size-48 rounded-full overflow-hidden">
+            <div className="relative size-36 md:size-48 rounded-full shadow-black shadow-sm">
               <Image
                 src={userParsed.photo}
                 alt="Profile Image"
                 layout="fill"
-                className="rounded-full object-cover shadow-lg"
+                className="rounded-full object-cover"
               />
             </div>
             <div>
