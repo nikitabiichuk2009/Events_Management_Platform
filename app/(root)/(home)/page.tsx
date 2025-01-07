@@ -73,8 +73,8 @@ export default async function Home({
             </h1>
             <p className="p-regular-16 md:p-regular-18 xl:p-regular-24 text-primary-400">
               Evently is your go-to platform for creating, managing, and
-              promoting events. Whether you're a seasoned event planner or a
-              first-time organizer, we've got you covered.
+              promoting events. Whether you're an experienced event planner or
+              a first-time organizer, we've got you covered.
             </p>
             <Button className="md:w-fit rounded-full" size="lg">
               <Link href="#events">Explore events</Link>
