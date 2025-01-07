@@ -5,8 +5,9 @@ import Link from "next/link";
 import React from "react";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
+import { SheetClose } from "@/components/ui/sheet";
 
-const NavItems = ({ otherClasses }: { otherClasses?: string }) => {
+const NavItems = ({ otherClasses, isMobile = false }: { otherClasses?: string; isMobile?: boolean }) => {
   const pathname = usePathname();
   const { userId } = useAuth();
 
@@ -16,18 +17,22 @@ const NavItems = ({ otherClasses }: { otherClasses?: string }) => {
         const route =
           link.label === "Profile" ? `/profile/${userId || ""}` : link.route;
 
+        const linkElement = (
+          <Link
+            href={route}
+            className={`${
+              pathname === route
+                ? "text-primary-500"
+                : "text-black hover:text-primary-400 whitespace-nowrap transition-colors duration-200 ease-in-out"
+            } font-medium`}
+          >
+            {link.label}
+          </Link>
+        );
+
         return (
           <li key={link.label}>
-            <Link
-              href={route}
-              className={`${
-                pathname === route
-                  ? "text-primary-500"
-                  : "text-black hover:text-primary-400 whitespace-nowrap transition-colors duration-200 ease-in-out"
-              } font-medium`}
-            >
-              {link.label}
-            </Link>
+            {isMobile ? <SheetClose asChild>{linkElement}</SheetClose> : linkElement}
           </li>
         );
       })}
