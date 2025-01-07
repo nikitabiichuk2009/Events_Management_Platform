@@ -8,10 +8,12 @@ const Pagination = ({
   pageNumber,
   isNext,
   section,
+  pageName,
 }: {
   pageNumber: number;
   isNext: boolean;
   section?: string;
+  pageName?: string;
 }) => {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -25,7 +27,7 @@ const Pagination = ({
       direction === "prev" ? pageNumber - 1 : pageNumber + 1;
     const newUrl = formUrlQuery({
       params: searchParams.toString(),
-      key: "page",
+      key: pageName || "page",
       value: nextpageNumber.toString(),
     });
     router.push(section ? `${newUrl}#${section}` : newUrl);

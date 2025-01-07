@@ -8,18 +8,20 @@ import {
   getUserByClerkId,
   getUserOrganizedEvents,
   getUserCategories,
+  getUserTickets,
 } from "@/lib/actions/user.actions";
 import NoResults from "@/components/shared/NoResults";
 import { Button } from "@/components/ui/button";
 import ProfileLink from "@/components/shared/ProfileLink";
 import EventsCollection from "@/components/shared/EventsCollection";
 import { stringifyObject } from "@/lib/utils";
-import { Event, SearchParamProps } from "@/types";
+import { Event, SearchParamProps, Order } from "@/types";
 import { Badge } from "@/components/ui/badge";
-import { EventFilters } from "@/constants";
+import { EventFilters, TicketFilters } from "@/constants";
 import SearchBar from "@/components/shared/SearchBar";
 import Filter from "@/components/shared/Filter";
 import Pagination from "@/components/shared/Pagination";
+
 export const metadata: Metadata = {
   title: "Evently | Profile Page",
   description: "Profile page of user",
@@ -38,10 +40,18 @@ export default async function ProfilePage({
 
   const resolvedSearchParams = await searchParams;
 
-  const searchQuery = resolvedSearchParams.q || "";
-  const filter = resolvedSearchParams.filter || "";
-  const page = resolvedSearchParams.page
-    ? parseInt(resolvedSearchParams.page, 10)
+  const searchQueryEventsOrganized =
+    resolvedSearchParams.q_events_organized || "";
+  const filterEventsOrganized =
+    resolvedSearchParams.filter_events_organized || "";
+  const pageEventsOrganized = resolvedSearchParams.page_events_organized
+    ? parseInt(resolvedSearchParams.page_events_organized, 10)
+    : 1;
+
+  const searchQueryTickets = resolvedSearchParams.q_tickets || "";
+  const filterTickets = resolvedSearchParams.filter_tickets || "";
+  const pageTickets = resolvedSearchParams.page_tickets
+    ? parseInt(resolvedSearchParams.page_tickets, 10)
     : 1;
 
   let userParsed;
@@ -53,6 +63,10 @@ export default async function ProfilePage({
   let userCategoriesCount = 0;
   let hasErrorOccurredDuringCategoriesFetch = false;
   let hasErrorOccurredDuringOrganizedEventsFetch = false;
+  let userTickets: Order[] = [];
+  let userTicketsCount = 0;
+  let isNextTicketsPage = false;
+  let hasErrorOccurredDuringTicketsFetch = false;
 
   try {
     const user = await getUserByClerkId(profileId, false);
@@ -86,16 +100,33 @@ export default async function ProfilePage({
   }
 
   try {
+    const unParsedTickets = await getUserTickets({
+      userId: userParsed._id,
+      limit: 12,
+      page: pageTickets,
+      query: searchQueryTickets,
+      category: filterTickets,
+    });
+    const parsedTickets = stringifyObject(unParsedTickets);
+    userTickets = parsedTickets.tickets;
+    userTicketsCount = userTickets.length;
+    isNextTicketsPage = parsedTickets.isNextPage;
+  } catch (error) {
+    console.error("Error fetching user tickets:", error);
+    hasErrorOccurredDuringTicketsFetch = true;
+  }
+
+  try {
     const unParsedEvents = await getUserOrganizedEvents({
       userId: userParsed._id,
-      limit: 10,
-      page,
-      query: searchQuery,
-      category: filter,
+      limit: 12,
+      page: pageEventsOrganized,
+      query: searchQueryEventsOrganized,
+      category: filterEventsOrganized,
     });
     const parsedEvents = stringifyObject(unParsedEvents);
     organizedEvents = parsedEvents.events;
-    organizedEventsCount = organizedEvents.length;
+    organizedEventsCount = parsedEvents.totalOrganizedEventsCount;
     isNextOrganizedEvents = parsedEvents.isNextPage;
   } catch (error) {
     console.error("Error fetching organized events:", error);
@@ -106,7 +137,7 @@ export default async function ProfilePage({
     <>
       <section
         id="profile-header"
-        className="wrapper flex flex-col justify-start w-full"
+        className="wrapper flex flex-col justify-start w-full py-5 md:py-10"
       >
         <div className="flex items-center justify-between flex-col md:flex-row gap-4 md:gap-0">
           <div className="flex items-center gap-6">
@@ -169,26 +200,59 @@ export default async function ProfilePage({
           </p>
         )}
       </section>
-      <section id="profile-tickets" className="bg-primary-50">
-        <div className="wrapper">
-          <div className="flex flex-col gap-4 text-center sm:text-left">
-            <h2 className="h2-bold">
-              Tickets - <span className="text-primary-400">0</span>
-            </h2>
-            <p className="p-regular-16 md:p-regular-18 xl:p-regular-20 text-primary-400 font-spaceGrotesk">
-              Tickets purchased by this user.
-            </p>
+      {!hasErrorOccurredDuringTicketsFetch ? (
+        <section id="profile-tickets" className="bg-primary-50">
+          <div className="wrapper">
+            <div className="flex flex-col gap-4 text-center sm:text-left">
+              <h2 className="h2-bold">
+                Tickets -{" "}
+                <span className="text-primary-400">{userTicketsCount}</span>
+              </h2>
+              <p className="p-regular-16 md:p-regular-18 xl:p-regular-20 text-primary-400 font-spaceGrotesk">
+                Events purchased by this user.
+              </p>
+            </div>
+            <div className="mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center">
+              <SearchBar
+                searchFor="Search for purchased events"
+                iconPosition="left"
+                route="/"
+                imgSrc="/assets/icons/search.svg"
+                otherClasses="flex-1"
+                searchName="q_tickets"
+              />
+              <Filter
+                filters={TicketFilters}
+                otherClasses="min-h-[56px] sm:min-w-[170px]"
+                filterName="filter_tickets"
+              />
+            </div>
+            <EventsCollection
+              data={userTickets}
+              collectionType="All_Tickets"
+              emptyTitle="No events purchased yet"
+              emptyDescription="This user hasn't purchased any events yet."
+              emptyButtonTitle="Discover other activity"
+              emptyButtonHref="#profile-header"
+            />
+            <div className="mt-10">
+              <Pagination
+                pageNumber={pageTickets}
+                isNext={isNextTicketsPage}
+                section="profile-tickets"
+                pageName="page_tickets"
+              />
+            </div>
           </div>
-          {/* <EventsCollection
-            data={organizedEvents}
-            collectionType="All_Tickets"
-            emptyTitle="No tickets purchased yet"
-            emptyDescription="This user hasn't purchased any tickets yet."
-            emptyButtonTitle="Explore Events"
-            emptyButtonHref="/#events"
-          /> */}
-        </div>
-      </section>
+        </section>
+      ) : (
+        <NoResults
+          title="Error fetching user's tickets"
+          description="We couldn't fetch the tickets or could not load the tickets. Please try again later."
+          buttonTitle="Go Back"
+          href="/profile"
+        />
+      )}
       {!hasErrorOccurredDuringCategoriesFetch ? (
         <section id="profile-categories" className="mt-8 bg-white">
           <div className="wrapper">
@@ -221,8 +285,8 @@ export default async function ProfilePage({
                 <NoResults
                   title="No categories found"
                   description="This user hasn't used any categories yet."
-                  buttonTitle="Go Back"
-                  href="/profile"
+                  buttonTitle="Discover other activity"
+                  href="#profile-header"
                 />
               )}
               {userCategories.length > 15 && (
@@ -238,7 +302,7 @@ export default async function ProfilePage({
           title="Error fetching categories"
           description="We couldn't fetch the categories or could not load the categories. Please try again later."
           buttonTitle="Go Back"
-          href="/profile"
+          href="/"
         />
       )}
       {!hasErrorOccurredDuringOrganizedEventsFetch ? (
@@ -271,25 +335,28 @@ export default async function ProfilePage({
                 route="/"
                 imgSrc="/assets/icons/search.svg"
                 otherClasses="flex-1"
+                searchName="q_events_organized"
               />
               <Filter
                 filters={EventFilters}
                 otherClasses="min-h-[56px] sm:min-w-[170px]"
+                filterName="filter_events_organized"
               />
             </div>
             <EventsCollection
               data={organizedEvents}
-              collectionType="All_Events"
+              collectionType="Events_Organized"
               emptyTitle="No events organized yet"
               emptyDescription="This user hasn't organized any events yet."
-              emptyButtonTitle="Explore Events"
-              emptyButtonHref="/#events"
+              emptyButtonTitle="Discover other activity"
+              emptyButtonHref="#profile-header"
             />
             <div className="mt-10">
               <Pagination
-                pageNumber={page}
+                pageNumber={pageEventsOrganized}
                 isNext={isNextOrganizedEvents}
                 section="profile-organized-events"
+                pageName="page_events_organized"
               />
             </div>
           </div>
@@ -299,7 +366,7 @@ export default async function ProfilePage({
           title="Error fetching organized events"
           description="We couldn't fetch the organized events or could not load the events. Please try again later."
           buttonTitle="Go Back"
-          href="/profile"
+          href="/"
         />
       )}
     </>

@@ -41,7 +41,7 @@ export default async function Home({
     const result = await getAllEvents({
       query: searchQuery,
       category: filter,
-      limit: 10,
+      limit: 12,
       page: page,
     });
     const parsedResult = stringifyObject(result);

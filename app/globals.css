@@ -108,7 +108,7 @@ body {
   }
 
   .h2-for-event-details {
-    @apply font-bold text-[22px] leading-[30px] xl:text-[30px] xl:leading-[38px];
+    @apply font-bold text-[22px] leading-[30px] xl:text-[26px] xl:leading-[34px] 2xl:text-[30px] 2xl:leading-[38px];
   }
 
   .h2-medium {
@@ -209,6 +209,10 @@ body {
 
   .p-medium-14 {
     @apply text-[14px] font-medium leading-[20px];
+  }
+
+  .p-medium-14_5 {
+    @apply text-[14.5px] font-medium leading-[20.5px];
   }
 
   .p-regular-14 {

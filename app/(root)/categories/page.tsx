@@ -40,7 +40,7 @@ export default async function CategoriesPage({
       query: searchQuery,
       filter,
       page,
-      pageSize: 10,
+      limit: 16,
     });
     allCategories = stringifyObject(categories.categories);
     isNext = categories.isNext;

@@ -26,15 +26,12 @@ export default async function UpdateProfilePage({
 
   if (userId !== profileOwnerId) {
     return (
-      <div className="wrapper flex flex-col items-center">
-        <h1 className="h2-bold">Access Forbidden</h1>
-        <NoResults
-          title="Access Forbidden"
-          description="You are not allowed to access this profile."
-          buttonTitle="Go Back"
-          href="/"
-        />
-      </div>
+      <NoResults
+        title="Access Forbidden"
+        description="You are not allowed to access this profile."
+        buttonTitle="Go Back"
+        href="/"
+      />
     );
   }
 
@@ -58,16 +55,18 @@ export default async function UpdateProfilePage({
   }
 
   return (
-    <section className="wrapper">
-      <div className="flex flex-col gap-4 text-center sm:text-left">
-        <h2 className="h2-bold">Update Profile</h2>
-        <p className="p-regular-16 md:p-regular-18 xl:p-regular-20 text-primary-400 font-spaceGrotesk">
-          Edit your bio, location, and personal website.
-        </p>
+    <>
+      <section className="bg-primary-50 py-5 md:py-10">
+        <div className="wrapper flex flex-col gap-2 text-center sm:text-left">
+          <h2 className="h2-bold">Update Profile</h2>
+          <p className="p-regular-16 md:p-regular-18 xl:p-regular-20 text-primary-400 font-spaceGrotesk">
+            Edit your bio, location, and personal website.
+          </p>
+        </div>
+      </section>
+      <div className="wrapper my-8">
+        <ProfileForm userId={userId || ""} initialValues={userProfile} />
       </div>
-      <div className="mt-8">
-        <ProfileForm userId={userId} initialValues={userProfile} />
-      </div>
-    </section>
+    </>
   );
 }

@@ -1,5 +1,6 @@
 import { ICategory } from "@/lib/database/models/category.model"
 import { IEvent } from "@/lib/database/models/event.model"
+import { IOrder } from "@/lib/database/models/order.model"
 import { IUser } from "@/lib/database/models/user.model"
 
 // ====== USER PARAMS
@@ -37,6 +38,14 @@ export type GetEventsByUserParams = {
 
 export type DeleteUserParams = {
   clerkId: string
+}
+
+export type GetUserTicketsParams = {
+  userId: string;
+  query?: string;
+  category?: string;
+  limit?: number;
+  page?: number;
 }
 
 export interface GetUserStatsParams {
@@ -118,11 +127,13 @@ export type GetRelatedEventsByCategoryParams = {
 
 export type Event = IEvent & { _id: string } & { organizer: IUser & { _id: string } } & { category: ICategory & { _id: string } };
 
+export type Order = IOrder & { _id: string } & { event: Event } & { buyer: IUser & { _id: string } };
+
 // ====== CATEGORY PARAMS
 export type GetAllCategoriesParams = {
   query?: string
   page?: number
-  pageSize?: number
+  limit?: number
   filter?: string;
 }
 
@@ -136,6 +147,7 @@ export type GetEventsByCategoryIdParams = {
 // ====== ORDER PARAMS
 export type CheckoutOrderParams = {
   eventTitle: string
+  eventDescription: string
   eventId: string
   price: number
   isFree: boolean

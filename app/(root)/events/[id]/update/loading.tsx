@@ -18,7 +18,7 @@ export default function UpdateEventLoading() {
             <Skeleton className="min-h-[56px] rounded-md w-full" />
             <Skeleton className="min-h-[56px] rounded-md w-full" />
           </div>
-          <Skeleton className="h-24 w-full rounded-md" />
+          <Skeleton className="min-h-28 w-full rounded-md" />
           <Skeleton className="h-96 w-full rounded-md" />
           <Skeleton className="min-h-[56px] rounded-md w-full" />
           <div className="flex flex-col md:flex-row gap-3">

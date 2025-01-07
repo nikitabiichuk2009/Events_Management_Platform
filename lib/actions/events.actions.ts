@@ -73,9 +73,11 @@ export async function updateEvent({
 
     const existingEvent = await Event.findById(event._id).populate({
       path: "organizer",
+      select: "clerkId",
       model: User,
     }).populate({
       path: "category",
+      select: "_id name",
       model: Category,
     });
 
@@ -134,7 +136,7 @@ export async function updateEvent({
       throw new Error("Error updating event");
     }
 
-    if(isCategoryChanged) {
+    if (isCategoryChanged) {
       // Check if the user has any remaining events in the old category
       const remainingEventsInOldCategory = await Event.countDocuments({
         organizer: existingEvent.organizer._id,
@@ -176,12 +178,12 @@ export async function deleteEventById(eventId: string): Promise<void> {
 
     await Category.updateOne(
       { _id: event.category },
-      { $pull: { events: event._id } }
+      { $pull: { events: event._id, followers: event.organizer } }
     );
 
     await User.updateMany(
       { savedEvents: event._id },
-      { $pull: { events: event._id, followers: event.organizer } }
+      { $pull: { events: event._id } }
     );
 
     await Order.deleteMany({ event: event._id });
@@ -216,13 +218,16 @@ export async function getAllEvents({
 
     const searchQuery: any = {};
     if (query) {
-      searchQuery.title = { $regex: query, $options: "i" };
+      searchQuery["$or"] = [
+        { "title": { $regex: query, $options: "i" } },
+        { "description": { $regex: query, $options: "i" } },
+      ];
     }
 
     let sortOption = {};
     switch (category) {
       case "popular":
-        sortOption = { savedCount: -1 };
+        sortOption = { savedCount: -1, createdAt: -1 };
         break;
       case "recent":
         sortOption = { createdAt: -1 };
@@ -252,8 +257,8 @@ export async function getAllEvents({
       .sort(sortOption)
       .skip(skip)
       .limit(limit)
-      .populate({ path: "organizer", model: User })
-      .populate({ path: "category", model: Category })
+      .populate({ path: "organizer", select: "clerkId username photo", model: User })
+      .populate({ path: "category", select: "_id name", model: Category })
       .exec();
 
     const totalEventsCount = await Event.countDocuments(searchQuery);
@@ -272,8 +277,8 @@ export async function getEventById(eventId: string) {
     await connectToDB();
 
     const event = await Event.findById(eventId)
-      .populate({ path: "organizer", model: User })
-      .populate({ path: "category", model: Category })
+      .populate({ path: "organizer", select: "clerkId username photo firstName lastName", model: User })
+      .populate({ path: "category", select: "_id name", model: Category })
       .exec();
 
     if (!event) {
@@ -308,13 +313,16 @@ export async function getRelatedEvents({
     };
 
     if (query) {
-      searchQuery.title = { $regex: query, $options: "i" };
+      searchQuery["$or"] = [
+        { "title": { $regex: query, $options: "i" } },
+        { "description": { $regex: query, $options: "i" } },
+      ];
     }
 
     let sortOption = {};
     switch (category) {
       case "popular":
-        sortOption = { savedCount: -1 };
+        sortOption = { savedCount: -1, createdAt: -1 };
         break;
       case "recent":
         sortOption = { createdAt: -1 };
@@ -337,8 +345,8 @@ export async function getRelatedEvents({
       .sort(sortOption)
       .skip(skip)
       .limit(limit)
-      .populate({ path: "organizer", model: User })
-      .populate({ path: "category", model: Category })
+      .populate({ path: "organizer", select: "clerkId username photo", model: User })
+      .populate({ path: "category", select: "_id name", model: Category })
       .exec();
 
     const totalCount = await Event.countDocuments(searchQuery);

@@ -19,9 +19,10 @@ interface Props {
   }[];
   otherClasses?: string;
   containerClasses?: string;
+  filterName?: string;
 }
 
-const Filter = ({ filters, otherClasses, containerClasses }: Props) => {
+const Filter = ({ filters, otherClasses, containerClasses, filterName }: Props) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const query = searchParams.get("filter");
@@ -32,13 +33,13 @@ const Filter = ({ filters, otherClasses, containerClasses }: Props) => {
     if (search === item) {
       const newUrl = removeKeysFromQuery({
         params: searchParams.toString(),
-        keys: ["filter"],
+        keys: [filterName || "filter"],
       });
       router.push(newUrl, { scroll: false });
     } else {
       const newUrl = formUrlQuery({
         params: searchParams.toString(),
-        key: "filter",
+        key: filterName || "filter",
         value: item,
       });
       router.push(newUrl, { scroll: false });

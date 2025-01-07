@@ -19,6 +19,7 @@ export async function checkoutOrder(order: CheckoutOrderParams) {
             unit_amount: price * 100,
             product_data: {
               name: order.eventTitle,
+              description: order.eventDescription
             },
           },
           quantity: 1,
@@ -29,8 +30,8 @@ export async function checkoutOrder(order: CheckoutOrderParams) {
         buyerId: order.buyerId,
       },
       mode: 'payment',
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/profile/${order.buyerClerkId}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/events/${order.eventId}?canceled=true`,
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/profile/${order.buyerClerkId}#profile-tickets`,
+      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/events/${order.eventId}?cancelledOrder=true`,
     });
     return stringifyObject(session.url);
   } catch (error) {

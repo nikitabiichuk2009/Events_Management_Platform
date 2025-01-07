@@ -15,9 +15,11 @@ const EventDetailsLoading = () => {
                 </h2>
                 <Skeleton className="size-6 rounded-md bg-slate-200" />
               </div>
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <Skeleton className="w-full h-11 md:w-32 bg-slate-200" />
+              <div className="flex flex-col gap-3 sm:flex-row lg:flex-col 2xl:flex-row sm:items-center lg:items-start 2xl:items-center">
                 <Skeleton className="h-8 w-28 bg-slate-200" />
-                <Skeleton className="h-6 w-36 bg-slate-200" />
+                <Skeleton className="h-6 w-32 bg-slate-200" />
+                <Skeleton className="h-8 w-40 bg-slate-200" />
               </div>
             </div>
             <div className="flex flex-col gap-5">

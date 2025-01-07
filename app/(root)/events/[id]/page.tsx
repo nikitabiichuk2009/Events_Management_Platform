@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { auth } from "@clerk/nextjs/server";
-import { getUserByClerkId } from "@/lib/actions/user.actions";
+import { getUserByClerkId, getUserTickets } from "@/lib/actions/user.actions";
 import EventDetailsHeaderCard from "@/components/shared/cards/EventDetailsCard";
 import { SearchParamProps } from "@/types";
 import { redirect } from "next/navigation";
@@ -42,29 +42,46 @@ export default async function EventPage({
   if (!eventId) {
     redirect("/");
   }
+
+  const cancelledOrder = resolvedSearchParams.cancelledOrder || "";
+  if (cancelledOrder) {
+    return (
+      <NoResults
+        title="Your ticket purchase was canceled"
+        description="It seems like your ticket purchase was not completed. If you believe you were charged, please contact our support team for assistance. You can also try purchasing the ticket again."
+        buttonTitle="Browse the event"
+        href={`/events/${eventId}`}
+      />
+    );
+  }
+
   let event;
   let user;
+  let userTickets;
   let relatedEvents;
   let isNext;
   let hasErrorOccurredDuringLoadingRelatedEvents = false;
   const { userId } = await auth();
-  try {
-    if (!userId) return;
-    const unParsedUser = await getUserByClerkId(userId, true);
-    user = stringifyObject(unParsedUser);
-  } catch (err) {
-    console.error(err);
-    return (
-      <div className="wrapper flex flex-col items-center">
-        <h1 className="h2-bold">Error Occurred</h1>
+  if (userId) {
+    try {
+      const unParsedUser = await getUserByClerkId(userId, true);
+      user = stringifyObject(unParsedUser);
+      const unParsedTickets = await getUserTickets({
+        userId: user._id,
+      });
+      const parsedTickets = stringifyObject(unParsedTickets);
+      userTickets = parsedTickets.tickets;
+    } catch (err) {
+      console.error(err);
+      return (
         <NoResults
-          title="User not found"
+          title="Error fetching user data"
           description="We couldn't load the current user. Please try again later."
           buttonTitle="Go Back"
           href="/events"
         />
-      </div>
-    );
+      );
+    }
   }
   try {
     const unParsedEvent = await getEventById(eventId);
@@ -91,7 +108,7 @@ export default async function EventPage({
         query: searchQuery,
         category: filter,
         page,
-        limit: 10,
+        limit: 12,
       });
       const parsedEvents = stringifyObject(unParsedRelatedEvents);
       relatedEvents = parsedEvents.events;
@@ -124,8 +141,9 @@ export default async function EventPage({
               <CheckoutButton
                 event={event}
                 user={{ clerkId: user.clerkId, userId: user._id }}
+                userTickets={userTickets || []}
               />
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <div className="flex flex-col gap-3 sm:flex-row lg:flex-col 2xl:flex-row sm:items-center lg:items-start 2xl:items-center">
                 <div className="flex gap-3 items-center">
                   <p
                     className={`p-bold-16 xl:p-bold-18 font-spaceGrotesk rounded-full px-5 py-2 line-clamp-1 ${
@@ -143,13 +161,23 @@ export default async function EventPage({
                   </Link>
                 </div>
                 <Link href={`/profile/${event.organizer.clerkId}`}>
-                  <p className="p-medium-16 xl:p-medium-18 ml-2 mt-2 sm:mt-0">
-                    by{" "}
-                    <span className="text-grey-500">
-                      {event.organizer.firstName} {event.organizer.lastName} | @
-                      {event.organizer.username}
-                    </span>{" "}
-                  </p>
+                  <div className="p-medium-16 xl:p-medium-18 ml-2 mt-2 sm:mt-0">
+                    <div className="flex items-center gap-2">
+                      by{" "}
+                      <div className="relative size-6 md:size-8 lg:size-6 xl:size-8 2xl:size-10 rounded-full overflow-hidden">
+                        <Image
+                          src={event.organizer.photo}
+                          alt="Organizer Image"
+                          layout="fill"
+                          className="rounded-full object-cover shadow-lg"
+                        />
+                      </div>
+                      <span className="text-grey-500">
+                        {event.organizer.firstName} {event.organizer.lastName} |
+                        @{event.organizer.username}
+                      </span>{" "}
+                    </div>
+                  </div>
                 </Link>
               </div>
             </div>

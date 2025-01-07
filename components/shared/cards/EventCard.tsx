@@ -25,49 +25,61 @@ import { useToast } from "@/hooks/use-toast";
 type EventCardProps = {
   event: Event;
   hasOrderLink: boolean;
-  hidePrice: boolean;
   userClerkId: string;
+  dateOfPurchase?: string;
 };
 
 export default function EventCard({
   event,
   hasOrderLink,
-  hidePrice,
   userClerkId,
+  dateOfPurchase,
 }: EventCardProps) {
-  const { toast } = useToast()
+  const { toast } = useToast();
   const handleDeleteEvent = async () => {
     try {
-      await deleteEventById(event._id)
+      await deleteEventById(event._id);
       toast({
         title: "Event deleted successfully",
         description: "Your event has been deleted successfully",
         className: "bg-green-500 text-white border-none",
-      })
+      });
     } catch (error) {
       toast({
         title: "Error deleting event",
         description: "An error occurred while deleting your event",
         className: "bg-red-500 text-white border-none",
-      })
+      });
     }
-  }
+  };
   return (
     <CardContainer className="shadow-lg rounded-xl overflow-hidden">
-      <CardBody className="bg-primary-50 relative group/card border-black/[0.1] h-[32rem] w-[25rem] rounded-xl p-6 border">
+      <CardBody
+        className={`bg-primary-50 relative group/card border-black/[0.1] ${
+          dateOfPurchase || hasOrderLink ? "h-[35rem]" : "h-[33rem]"
+        } w-[23rem] rounded-xl p-6 border`}
+      >
         <CardItem
           className="text-lg font-bold text-neutral-600 dark:text-white flex flex-row gap-4 items-center"
           as={"div"}
         >
-          <p className="whitespace-nowrap line-clamp-1">{event.title}</p>
+          <p
+            className={`whitespace-nowrap line-clamp-1 ${
+              userClerkId === event.organizer.clerkId
+                ? "max-w-[16rem]"
+                : "max-w-[20rem]"
+            }`}
+          >
+            {event.title}
+          </p>
           {userClerkId === event.organizer.clerkId && (
             <div className="flex flex-row gap-2">
               <Link href={`/events/${event._id}/update`}>
                 <Image
                   src="/assets/icons/edit.svg"
                   alt="edit icon"
-                  width={16}
-                  height={16}
+                  width={18}
+                  height={18}
                 />
               </Link>
               <AlertDialog>
@@ -75,8 +87,8 @@ export default function EventCard({
                   <Image
                     src="/assets/icons/delete.svg"
                     alt="delete icon"
-                    width={16}
-                    height={16}
+                    width={18}
+                    height={18}
                   />
                 </AlertDialogTrigger>
                 <AlertDialogContent className="bg-gray-50">
@@ -91,7 +103,9 @@ export default function EventCard({
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleDeleteEvent}>Delete</AlertDialogAction>
+                    <AlertDialogAction onClick={handleDeleteEvent}>
+                      Delete
+                    </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
@@ -110,7 +124,7 @@ export default function EventCard({
             src={event.imageUrl}
             height={1000}
             width={1000}
-            className="h-60 w-full object-cover rounded-xl"
+            className="h-56 w-full object-cover rounded-xl"
             alt="Event image"
           />
           <div className="flex flex-col gap-5 mt-4">
@@ -152,23 +166,30 @@ export default function EventCard({
             </CardItem> */}
           </div>
           <div className="flex gap-3 items-center mt-4">
-            {!hidePrice && (
-              <p
-                className={`p-bold-16 font-spaceGrotesk rounded-full px-5 py-2 line-clamp-1 ${
-                  event.isFree
-                    ? "text-green-500 bg-green-500/10"
-                    : "text-primary-400 bg-primary-500/10"
-                }`}
-              >
-                {event.isFree ? "Free" : `$${event.price}`}
-              </p>
-            )}
-            <Link href={`/events?category=${event.category._id}`}>
+            <p
+              className={`p-bold-16 font-spaceGrotesk rounded-full px-5 py-2 line-clamp-1 ${
+                event.isFree
+                  ? "text-green-500 bg-green-500/10"
+                  : "text-primary-400 bg-primary-500/10"
+              }`}
+            >
+              {event.isFree ? "Free" : `$${event.price}`}
+            </p>
+            <Link href={`/categories/${event.category._id}`}>
               <Badge className="w-fit border-none px-4 py-2 text-white bg-primary-400 rounded-full cursor-pointer line-clamp-1">
                 {event.category.name}
               </Badge>
             </Link>
           </div>
+          <p className="p-medium-14_5 text-white mt-2 bg-orange-400 rounded-full px-3 py-1.5 w-fit">
+            <span className="text-primary-500 font-bold font-spaceGrotesk">{event.savedCount} </span>
+            {event.savedCount === 1 ? "save" : "saves"}
+          </p>
+          {dateOfPurchase && (
+            <p className="p-medium-16 font-spaceGrotesk text-grey-400 mt-2">
+              Purchased on: {formatDateTime(dateOfPurchase)}
+            </p>
+          )}
         </CardItem>
         <div className="flex justify-between items-center mt-8">
           <div className="flex flex-col gap-2">
@@ -177,8 +198,17 @@ export default function EventCard({
               href={`/profile/${event.organizer.clerkId}`}
               className="px-4 py-2 rounded-xl text-sm font-normal text-grey-500"
             >
-              {event.organizer.firstName} {event.organizer.lastName} | @
-              {event.organizer.username}
+              <div className="flex flex-row gap-2 items-center">
+                <div className="relative size-6 rounded-full overflow-hidden">
+                  <Image
+                    src={event.organizer.photo!}
+                    alt="Profile Image"
+                    layout="fill"
+                    className="rounded-full object-cover shadow-lg"
+                  />
+                </div>
+                @{event.organizer.username}
+              </div>
             </CardItem>
             {hasOrderLink && (
               <CardItem
@@ -192,7 +222,7 @@ export default function EventCard({
           </div>
           <CardItem as={Link} href={`/events/${event._id}`}>
             <Button className="rounded-full text-xs px-4 py-[1.5]">
-              View more info -&gt;
+              Details -&gt;
             </Button>
           </CardItem>
         </div>

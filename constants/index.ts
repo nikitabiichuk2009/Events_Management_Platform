@@ -12,12 +12,16 @@ export const headerLinks = [
     route: '/categories',
   },
   {
-    label: 'My Profile',
+    label: 'Profile',
     route: '/profile',
   },
   {
     label: 'Saved',
     route: '/saved',
+  },
+  {
+    label: 'Orders',
+    route: '/orders',
   },
 ]
 
@@ -50,4 +54,11 @@ export const EventFilters = [
   { name: "Free (only)", value: "free" },
   { name: "Cheapest", value: "cheapest" },
   { name: "Most Expensive", value: "most-expensive" },
+];
+
+export const TicketFilters = [
+  { name: "Recently Purchased", value: "recently-purchased" },
+  { name: "Oldest", value: "oldest" },
+  { name: "Most Expensive", value: "most-expensive" },
+  { name: "Cheapest", value: "cheapest" },
 ];

@@ -10,7 +10,7 @@ import User from "../database/models/user.model";
 export async function getAllCategories(params: GetAllCategoriesParams): Promise<{ categories: ICategory[], isNext: boolean }> {
   try {
     await connectToDB();
-    const { page = 1, pageSize = 10, query, filter } = params;
+    const { page = 1, limit = 10, query, filter } = params;
     const searchQuery: FilterQuery<typeof Category> = query
       ? { name: { $regex: new RegExp(query, "i") } }
       : {};
@@ -18,7 +18,7 @@ export async function getAllCategories(params: GetAllCategoriesParams): Promise<
     let sortOption = {};
     switch (filter) {
       case "popular":
-        sortOption = { eventsCount: -1 };
+        sortOption = { eventsCount: -1, createdAt: -1 };
         break;
       case "recent":
         sortOption = { createdAt: -1 };
@@ -30,7 +30,7 @@ export async function getAllCategories(params: GetAllCategoriesParams): Promise<
         sortOption = { createdAt: 1 };
         break;
       default:
-        sortOption = { eventsCount: -1 };
+        sortOption = { createdAt: -1 };
         break;
     }
     const categories = await Category.aggregate([
@@ -41,11 +41,11 @@ export async function getAllCategories(params: GetAllCategoriesParams): Promise<
         }
       },
       { $sort: sortOption },
-      { $skip: (page - 1) * pageSize },
-      { $limit: pageSize }
+      { $skip: (page - 1) * limit },
+      { $limit: limit }
     ]);
     const totalCategories = await Category.countDocuments(searchQuery);
-    const hasNextPage = totalCategories > ((page - 1) * pageSize) + categories.length;
+    const hasNextPage = totalCategories > ((page - 1) * limit) + categories.length;
     return { categories, isNext: hasNextPage };
   } catch (err) {
     console.error("Error getting all categories:", err);
@@ -73,13 +73,16 @@ export async function getEventsByCategoryId({
       category: categoryId,
     };
     if (query) {
-      searchQuery.title = { $regex: query, $options: "i" };
+      searchQuery["$or"] = [
+        { "title": { $regex: query, $options: "i" } },
+        { "description": { $regex: query, $options: "i" } },
+      ];
     }
 
     let sortOption = {};
     switch (filter) {
       case "popular":
-        sortOption = { savedCount: -1 };
+        sortOption = { savedCount: -1, createdAt: -1 };
         break;
       case "recent":
         sortOption = { createdAt: -1 };
@@ -109,8 +112,8 @@ export async function getEventsByCategoryId({
       .sort(sortOption)
       .skip(skip)
       .limit(limit)
-      .populate({ path: "organizer", model: User })
-      .populate({ path: "category", model: Category })
+      .populate({ path: "organizer", select:"clerkId username photo", model: User })
+      .populate({ path: "category", select:"_id name", model: Category })
       .exec();
 
     const totalEventsCount = await Event.countDocuments(searchQuery);

@@ -46,7 +46,7 @@ export default async function SavedEventsPage({
       query: searchQuery,
       category: filter,
       page,
-      limit: 10,
+      limit: 12,
     });
     const parsedResult = stringifyObject(result);
     savedEvents = parsedResult.savedEvents;

@@ -11,12 +11,14 @@ const SearchBar = ({
   iconPosition,
   imgSrc,
   otherClasses,
+  searchName,
 }: {
   searchFor: string;
   iconPosition: string;
   imgSrc: string;
   otherClasses?: string;
   route?: string;
+  searchName?: string;
 }) => {
   const router = useRouter();
   const pathName = usePathname();
@@ -31,14 +33,14 @@ const SearchBar = ({
       if (search) {
         const newUrl = formUrlQuery({
           params: searchParams.toString(),
-          key: "q",
+          key: searchName || "q",
           value: search,
         });
         router.push(newUrl, { scroll: false });
       } else {
         const newUrl = removeKeysFromQuery({
           params: searchParams.toString(),
-          keys: ["q"],
+          keys: [searchName || "q"],
         });
         router.push(newUrl, { scroll: false });
       }

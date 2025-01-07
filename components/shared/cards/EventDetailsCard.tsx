@@ -57,7 +57,7 @@ export default function EventDetailsHeaderCard({
         width={24}
         height={24}
         alt="saved"
-        className={`cursor-pointer ${isSubmitting ? "opacity-50" : ""}`}
+        className="cursor-pointer"
         onClick={isSubmitting ? undefined : handleSaveEvent}
       />
     </div>

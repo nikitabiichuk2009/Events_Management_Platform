@@ -23,6 +23,7 @@ const Checkout = ({
     console.log("checkout");
     const order = {
       eventTitle: event.title,
+      eventDescription: event.description,
       eventId: event._id,
       price: event.price,
       isFree: event.isFree,
@@ -60,6 +61,7 @@ const Checkout = ({
     <Button
       type="submit"
       role="link"
+      size="lg"
       className="w-full md:w-fit"
       onClick={onCheckout}
     >

@@ -6,15 +6,15 @@ import React from "react";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 
-const NavItems = () => {
+const NavItems = ({ otherClasses }: { otherClasses?: string }) => {
   const pathname = usePathname();
   const { userId } = useAuth();
 
   return (
-    <ul className="flex md:justify-between md:flex-row w-full flex-col items-start gap-5">
+    <ul className={`flex md:justify-between md:flex-row w-full flex-col items-start gap-5 ${otherClasses}`}>
       {headerLinks.map((link) => {
         const route =
-          link.label === "My Profile" ? `/profile/${userId || ""}` : link.route;
+          link.label === "Profile" ? `/profile/${userId || ""}` : link.route;
 
         return (
           <li key={link.label}>

@@ -153,8 +153,6 @@ const EventForm = ({
         className: "bg-red-500 text-white border-none",
       });
       router.push("/");
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -184,7 +182,7 @@ const EventForm = ({
                   />
                 </FormControl>
                 <FormDescription className="form-description">
-                  This is the title of your event (3-40 characters).
+                  This is the title of your event (3-50 characters).
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -205,7 +203,7 @@ const EventForm = ({
                   />
                 </FormControl>
                 <FormDescription className="form-description">
-                  This is the category of your event (3-35 characters).
+                  This is the category of your event (3-40 characters).
                 </FormDescription>
                 <FormMessage />
               </FormItem>

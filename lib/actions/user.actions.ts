@@ -6,7 +6,7 @@ import User, { IUser } from "../database/models/user.model";
 import Order from "../database/models/order.model";
 import Category from "../database/models/category.model";
 import Event, { IEvent } from "../database/models/event.model";
-import { CreateUserParams, DeleteUserParams, GetEventsByUserParams, GetSavedEventsByUserParams, SaveEventParams, UpdateUserParams } from "@/types";
+import { CreateUserParams, DeleteUserParams, GetEventsByUserParams, GetSavedEventsByUserParams, SaveEventParams, UpdateUserParams, GetUserTicketsParams } from "@/types";
 import { FilterQuery } from "mongoose";
 import { stringifyObject } from '@/lib/utils';
 import mongoose from "mongoose";
@@ -91,14 +91,14 @@ export async function getUserCategories(userId: string): Promise<{ name: string;
       { $match: { followers: userObjectId } },
       {
         $project: {
-          _id: 0,
+          _id: 1,
           name: 1,
         },
       },
     ]);
     const categories = categoriesResult.map((category: { name: string, _id: string }) => ({
       name: category.name,
-      id: category._id,
+      id: category._id.toString(),
     }));
     return categories;
   } catch (error) {
@@ -113,7 +113,7 @@ export async function getUserOrganizedEvents({
   category = "",
   page = 1,
   limit = 10,
-}: GetEventsByUserParams): Promise<{ events: Event[]; isNextPage: boolean }> {
+}: GetEventsByUserParams): Promise<{ events: Event[]; isNextPage: boolean, totalOrganizedEventsCount: number }> {
   try {
     await connectToDB();
 
@@ -122,16 +122,25 @@ export async function getUserOrganizedEvents({
     const searchQuery: FilterQuery<IEvent> = { organizer: userObjectId };
 
     if (query) {
-      searchQuery.title = { $regex: query, $options: "i" };
+      searchQuery["$or"] = [
+        { "title": { $regex: query, $options: "i" } },
+        { "description": { $regex: query, $options: "i" } },
+      ];
     }
 
     let sortOption = {};
     switch (category) {
       case "popular":
-        sortOption = { savedCount: -1 };
+        sortOption = { savedCount: -1, createdAt: -1 };
         break;
       case "recent":
         sortOption = { createdAt: -1 };
+        break;
+      case "name":
+        sortOption = { title: 1 };
+        break;
+      case "old":
+        sortOption = { createdAt: 1 };
         break;
       case "free":
         searchQuery.isFree = true;
@@ -152,16 +161,103 @@ export async function getUserOrganizedEvents({
       .sort(sortOption)
       .skip(skip)
       .limit(limit)
-      .populate({ path: "category", model: Category })
-      .populate({ path: "organizer", model: User });
+      .populate({ path: "category", select: "_id name", model: Category })
+      .populate({ path: "organizer", select: "clerkId username photo", model: User });
 
     const totalCount = await Event.countDocuments(searchQuery);
+    const totalOrganizedEventsCount = await Event.countDocuments({ organizer: userObjectId });
     const isNextPage = totalCount > skip + events.length;
 
-    return { events, isNextPage };
+    return { events, isNextPage, totalOrganizedEventsCount };
   } catch (err) {
     console.error("Error fetching organized events:", err);
     throw new Error("Error fetching organized events");
+  }
+}
+
+export async function getUserTickets({
+  userId,
+  query = "",
+  category = "",
+  limit = 10,
+  page = 1,
+}: GetUserTicketsParams): Promise<{ tickets: typeof Order[]; isNextPage: boolean; totalTicketsCount: number }> {
+  try {
+    await connectToDB();
+
+    const skip = (page - 1) * limit;
+
+    let matchingEventIds: mongoose.Types.ObjectId[] = [];
+    if (query) {
+      const searchRegex = new RegExp(query, "i");
+      const matchingEvents = await Event.find({
+        $or: [
+          { title: searchRegex },
+          { description: searchRegex }
+        ]
+      }).select('_id');
+      matchingEventIds = matchingEvents.map(event => event._id);
+    }
+
+    const searchQuery: FilterQuery<typeof Order> = { buyer: userId };
+    if (query) {
+      searchQuery.event = { $in: matchingEventIds };
+    }
+
+    let sortOption = {};
+    switch (category) {
+      case "recently-purchased":
+        sortOption = { createdAt: -1 };
+        break;
+      case "oldest":
+        sortOption = { createdAt: 1 };
+        break;
+      case "cheapest":
+        sortOption = { totalAmount: 1 };
+        break;
+      case "most-expensive":
+        sortOption = { totalAmount: -1 };
+        break;
+      default:
+        sortOption = { createdAt: -1 };
+        break;
+    }
+
+    let tickets = await Order.find(searchQuery)
+      .sort(sortOption)
+      .skip(skip)
+      .limit(limit)
+      .populate({
+        path: "event",
+        model: Event,
+        select: "title description startDateTime endDateTime category organizer savedCount _id imageUrl price isFree",
+        populate: [
+          {
+            path: "organizer",
+            model: User,
+            select: "firstName lastName username clerkId photo",
+          },
+          {
+            path: "category",
+            model: Category,
+            select: "name _id",
+          },
+        ],
+      })
+      .populate({
+        path: "buyer",
+        model: User,
+        select: "firstName lastName username clerkId photo",
+      });
+
+    const totalCount = await Order.countDocuments(searchQuery);
+    const totalTicketsCount = await Order.countDocuments({ buyer: userId });
+    const isNextPage = totalCount > skip + tickets.length;
+
+    return { tickets, isNextPage, totalTicketsCount };
+  } catch (err) {
+    console.error("Error fetching user tickets:", err);
+    throw new Error("Error fetching user tickets");
   }
 }
 
@@ -246,13 +342,16 @@ export async function getUserSavedEventsByClerkId({
     };
 
     if (query) {
-      searchQuery.title = { $regex: query, $options: "i" };
+      searchQuery["$or"] = [
+        { "title": { $regex: query, $options: "i" } },
+        { "description": { $regex: query, $options: "i" } },
+      ];
     }
 
     let sortOption = {};
     switch (category) {
       case "popular":
-        sortOption = { savedCount: -1 };
+        sortOption = { savedCount: -1, createdAt: -1 };
         break;
       case "recent":
         sortOption = { createdAt: -1 };
@@ -282,8 +381,8 @@ export async function getUserSavedEventsByClerkId({
       .sort(sortOption)
       .skip(skip)
       .limit(limit)
-      .populate({ path: "organizer", model: User })
-      .populate({ path: "category", model: Category })
+      .populate({ path: "organizer", select: "clerkId username photo", model: User })
+      .populate({ path: "category", select: "_id name", model: Category })
       .exec();
 
     const totalSavedEventsCount = await Event.countDocuments(searchQuery);
@@ -293,5 +392,47 @@ export async function getUserSavedEventsByClerkId({
   } catch (err) {
     console.error("Error fetching saved events:", err);
     throw new Error("Error fetching saved events");
+  }
+}
+
+export async function getUserOrganizedEventsAndOrders(clerkId: string) {
+  try {
+    await connectToDB();
+
+    const user = await User.findOne({ clerkId });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const organizedEvents = await Event.find({ organizer: user._id });
+
+    if (!organizedEvents.length) {
+      return {
+        organizedEvents: [],
+        orders: [],
+      };
+    }
+
+    const eventIds = organizedEvents.map((event) => event._id);
+    const orders = await Order.find({ event: { $in: eventIds } })
+      .populate({
+        path: "event",
+        model: Event,
+        select: "title description",
+      })
+      .populate({
+        path: "buyer",
+        model: User,
+        select: "username email photo clerkId",
+      });
+
+    return {
+      organizedEvents,
+      orders,
+    };
+  } catch (err) {
+    console.error("Error fetching user-organized events and orders:", err);
+    throw new Error("Error fetching user-organized events and orders");
   }
 }

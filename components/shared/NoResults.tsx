@@ -24,7 +24,7 @@ const NoResults = ({
       <h3 className="h5-semibold">
         {title}
       </h3>
-      <p className="body-regular text-light-2 my-3.5 max-w-md text-center font-spaceGrotesk">
+      <p className="p-regular-16 text-light-2 my-3.5 max-w-md text-center font-spaceGrotesk">
         {description}
       </p>
       {href ? (

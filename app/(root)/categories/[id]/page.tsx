@@ -44,7 +44,7 @@ export default async function CategoryPage({
       query: searchQuery,
       filter,
       page,
-      limit: 10,
+      limit: 12,
     });
     const parsedResult = stringifyObject(result);
     events = parsedResult.events;
