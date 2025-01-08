@@ -144,7 +144,7 @@ export default async function ProfilePage({
             <div className="relative size-36 md:size-48 rounded-full shadow-black shadow-sm">
               <Image
                 src={userParsed.photo}
-                alt="Profile Image"
+                alt={userParsed.username}
                 layout="fill"
                 className="rounded-full object-cover"
               />

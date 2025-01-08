@@ -5,8 +5,10 @@ const EventDetailsLoading = () => {
   return (
     <>
       <section className="flex justify-center bg-primary-50">
-        <div className="flex flex-col lg:flex-row gap-4 md:gap-10 lg:gap-12 xl:gap-16 max-lg:items-start max-lg:justify-center max-lg:wrapper">
-          <Skeleton className="min-h-[200px] min-w-[400px] sm:min-h-[250px] sm:min-w-[500px] xl:min-h-[300px] xl:min-w-[600px] object-cover object-center rounded-md bg-slate-200" />
+        <div className="flex flex-col lg:flex-row gap-4 md:gap-10 xl:gap-16 max-lg:items-start max-lg:justify-center wrapper lg:py-0">
+          <div className="relative rounded-md w-full lg:w-3/4 xl:w-full aspect-[16/9]">
+            <Skeleton className="absolute inset-0 object-cover object-center rounded-md bg-slate-200" />
+          </div>
           <div className="flex w-full flex-col gap-8 md:gap-10 lg:py-3">
             <div className="flex flex-col gap-6">
               <div className="flex gap-4 xl:gap-6 items-center">

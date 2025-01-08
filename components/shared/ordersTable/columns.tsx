@@ -37,7 +37,7 @@ export const columns: ColumnDef<Order>[] = [
               <div className="relative size-10">
                 <Image
                   src={buyer.photo}
-                  alt={`${buyer.username}'s avatar`}
+                  alt={buyer.username}
                   layout="fill"
                   className="rounded-full object-cover"
                 />

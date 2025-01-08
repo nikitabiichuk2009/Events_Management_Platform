@@ -416,6 +416,7 @@ export async function getUserOrganizedEventsAndOrders(clerkId: string) {
 
     const eventIds = organizedEvents.map((event) => event._id);
     const orders = await Order.find({ event: { $in: eventIds } })
+      .sort({ createdAt: -1 })
       .populate({
         path: "event",
         model: Event,

@@ -42,6 +42,11 @@ const Dropdown = ({
   const handleAddCategory = () => {
     const trimmedCategory = newCategory.trim();
 
+    if (trimmedCategory.length < 3 || trimmedCategory.length > 40) {
+      setError("Category name must be between 3 and 40 characters");
+      return;
+    }
+
     if (categories.some((category) => category.name === trimmedCategory)) {
       setError("Category already exists");
       return;

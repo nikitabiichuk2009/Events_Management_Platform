@@ -125,7 +125,7 @@ export default function EventCard({
             height={1000}
             width={1000}
             className="h-56 w-full object-cover rounded-xl"
-            alt="Event image"
+            alt={event.title}
           />
           <div className="flex flex-col gap-5 mt-4">
             <CardItem as="div" className="flex gap-2 md:gap-3 items-center">
@@ -182,7 +182,9 @@ export default function EventCard({
             </Link>
           </div>
           <p className="p-medium-14_5 text-white mt-2 bg-orange-400 rounded-full px-3 py-1.5 w-fit">
-            <span className="text-primary-500 font-bold font-spaceGrotesk">{event.savedCount} </span>
+            <span className="text-primary-500 font-bold font-spaceGrotesk">
+              {event.savedCount}{" "}
+            </span>
             {event.savedCount === 1 ? "save" : "saves"}
           </p>
           {dateOfPurchase && (
@@ -202,7 +204,7 @@ export default function EventCard({
                 <div className="relative size-6 rounded-full">
                   <Image
                     src={event.organizer.photo!}
-                    alt="Profile Image"
+                    alt={event.organizer.username}
                     layout="fill"
                     className="rounded-full object-cover"
                   />

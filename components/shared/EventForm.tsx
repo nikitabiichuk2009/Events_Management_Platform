@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -91,9 +91,11 @@ const EventForm = ({
     }
 
     setIsSubmitting(true);
+    const price = form.watch("price");
+    form.setValue("isFree", price === 0);
+    values.isFree = price === 0;
 
     values.price = values.isFree ? 0 : values.price;
-    console.log(values);
 
     let uploadImageUrl = values.imageUrl;
     if (files.length > 0) {
@@ -155,11 +157,6 @@ const EventForm = ({
       router.push("/");
     }
   };
-
-  useEffect(() => {
-    const price = form.watch("price");
-    form.setValue("isFree", price === 0);
-  }, [form.watch("price")]);
 
   return (
     <Form {...form}>

@@ -4,7 +4,7 @@ import Image from "next/image";
 import { saveEvent } from "@/lib/actions/user.actions";
 import { useToast } from "@/hooks/use-toast";
 
-export default function EventDetailsHeaderCard({
+export default function EventDetailsHeader({
   eventTitle,
   hasSaved,
   userClerkId,
