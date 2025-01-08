@@ -43,7 +43,7 @@ export default async function CreateEventPage() {
   }
 
   try {
-    const categoryList = await getAllCategories({});
+    const categoryList = await getAllCategories({ isFilterByName: true });
     const parsedCategory = stringifyObject(categoryList.categories);
     categories = parsedCategory.map((category: ICategory) => ({
       name: category.name,

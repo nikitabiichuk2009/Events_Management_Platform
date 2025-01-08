@@ -25,7 +25,7 @@ export default async function UpdateEventPage({ params }: { params: Promise<{ id
   try {
     const result = await getEventById(resolvedParams.id);
     event = stringifyObject(result);
-    const parsedCategories = await getAllCategories({});
+    const parsedCategories = await getAllCategories({ isFilterByName: true });
     categories = stringifyObject(parsedCategories.categories);
     if (event.organizer.clerkId !== userId) {
       return (

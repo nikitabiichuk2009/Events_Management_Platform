@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Select,
   SelectContent,
@@ -7,18 +7,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "../ui/input";
+import { Label } from "../ui/label";
 
 type DropdownProps = {
   onChangeHandler: (value: string) => void;
@@ -38,17 +38,6 @@ const Dropdown = ({
   const [newCategory, setNewCategory] = useState<string>("");
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (isDialogOpen) {
-      const timer = setTimeout(() => {
-        inputRef.current?.focus();
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [isDialogOpen]);
 
   const handleAddCategory = () => {
     const trimmedCategory = newCategory.trim();
@@ -85,48 +74,49 @@ const Dropdown = ({
               {category.name}
             </SelectItem>
           ))}
-          <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <AlertDialogTrigger className="p-medium-14 flex w-full py-3 pl-8 text-primary-500 hover:text-primary-400 duration-200 transition-colors ease-in-out">
-              Add Category
-            </AlertDialogTrigger>
-            <AlertDialogContent className="bg-gray-50">
-              <AlertDialogHeader>
-                <AlertDialogTitle>New Category</AlertDialogTitle>
-                <AlertDialogDescription>
-                  <Input
-                    ref={inputRef}
-                    value={newCategory}
-                    placeholder="Category Name"
-                    className="input-field text-black"
-                    onChange={(e) => setNewCategory(e.target.value)}
-                  />
-                  {error && (
-                    <span className="text-red-500 text-sm font-medium font-spaceGrotesk mt-2">
-                      {error}
-                    </span>
-                  )}
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <p className="cursor-pointer p-medium-14 flex w-full py-3 pl-8 text-primary-500 hover:text-primary-400 duration-200 transition-colors ease-in-out">
+                Add Category
+              </p>
+            </DialogTrigger>
+            <DialogContent className="bg-white">
+              <DialogHeader>
+                <DialogTitle>Add a New Category</DialogTitle>
+                <DialogDescription className="font-spaceGrotesk text-primary-400">
+                  Add a new category to enhance organization and easily group
+                  items. Ensure the name is unique and descriptive.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="category" className="text-left">
+                  Category Name
+                </Label>
+                <Input
+                  id="category"
+                  value={newCategory}
+                  onChange={(e) => setNewCategory(e.target.value)}
+                  className="input-field"
+                  placeholder="Enter category name"
+                />
+                {error && (
+                  <p className="text-red-500 text-sm font-medium mt-1">
+                    {error}
+                  </p>
+                )}
+              </div>
+              <DialogFooter>
+                <Button
+                  type="button"
                   onClick={() => {
-                    setError(null);
-                    setNewCategory("");
-                  }}
-                >
-                  Cancel
-                </AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={(e) => {
-                    e.preventDefault();
                     handleAddCategory();
                   }}
                 >
-                  Add
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+                  Save
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </SelectContent>
       </Select>
     </>

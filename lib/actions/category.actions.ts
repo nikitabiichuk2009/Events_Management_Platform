@@ -10,7 +10,7 @@ import User from "../database/models/user.model";
 export async function getAllCategories(params: GetAllCategoriesParams): Promise<{ categories: ICategory[], isNext: boolean }> {
   try {
     await connectToDB();
-    const { page = 1, limit = 10, query, filter } = params;
+    const { page = 1, limit = 10, query, filter, isFilterByName } = params;
     const searchQuery: FilterQuery<typeof Category> = query
       ? { name: { $regex: new RegExp(query, "i") } }
       : {};
@@ -30,7 +30,7 @@ export async function getAllCategories(params: GetAllCategoriesParams): Promise<
         sortOption = { createdAt: 1 };
         break;
       default:
-        sortOption = { createdAt: -1 };
+        sortOption = isFilterByName ? { name: 1 } : { createdAt: -1 };
         break;
     }
     const categories = await Category.aggregate([

@@ -135,6 +135,7 @@ export type GetAllCategoriesParams = {
   page?: number
   limit?: number
   filter?: string;
+  isFilterByName?: boolean;
 }
 
 export type GetEventsByCategoryIdParams = {
