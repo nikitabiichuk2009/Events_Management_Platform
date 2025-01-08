@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Select,
   SelectContent,
@@ -41,6 +41,15 @@ const Dropdown = ({
 
   const inputRef = useRef<HTMLInputElement>(null);
 
+  useEffect(() => {
+    if (isDialogOpen) {
+      const timer = setTimeout(() => {
+        inputRef.current?.focus();
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isDialogOpen]);
+
   const handleAddCategory = () => {
     const trimmedCategory = newCategory.trim();
 
@@ -81,10 +90,6 @@ const Dropdown = ({
               className="p-medium-14 flex w-full py-3 pl-8 text-primary-500 hover:text-primary-400 duration-200 transition-colors ease-in-out"
               onClick={() => {
                 setIsDialogOpen(true);
-            
-                setTimeout(() => {
-                  inputRef.current?.focus();
-                }, 250);
               }}
             >
               Add Category
