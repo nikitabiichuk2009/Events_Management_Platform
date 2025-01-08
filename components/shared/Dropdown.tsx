@@ -45,7 +45,7 @@ const Dropdown = ({
     if (isDialogOpen) {
       const timer = setTimeout(() => {
         inputRef.current?.focus();
-      }, 300);
+      }, 1000);
       return () => clearTimeout(timer);
     }
   }, [isDialogOpen]);
