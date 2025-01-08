@@ -91,11 +91,13 @@ const EventForm = ({
     }
 
     setIsSubmitting(true);
-    const price = form.watch("price");
-    form.setValue("isFree", price === 0);
-    values.isFree = price === 0;
-
-    values.price = values.isFree ? 0 : values.price;
+    if (values.isFree) {
+      values.price = 0;
+    } else {
+      const price = values.price;
+      form.setValue("isFree", price === 0);
+      values.isFree = price === 0;
+    }
 
     let uploadImageUrl = values.imageUrl;
     if (files.length > 0) {

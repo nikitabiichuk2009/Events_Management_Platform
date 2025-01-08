@@ -4,12 +4,16 @@ export const headerLinks = [
     route: '/',
   },
   {
-    label: 'Create Event',
+    label: 'New Event',
     route: '/create-event',
   },
   {
     label: 'Categories',
     route: '/categories',
+  },
+  {
+    label: 'Community',
+    route: '/community',
   },
   {
     label: 'Profile',
@@ -61,4 +65,10 @@ export const TicketFilters = [
   { name: "Oldest", value: "oldest" },
   { name: "Most Expensive", value: "most-expensive" },
   { name: "Cheapest", value: "cheapest" },
+];
+
+export const UserFilters = [
+  { name: "New Users", value: "newUsers" },
+  { name: "Old Users", value: "oldUsers" },
+  { name: "Top Creators", value: "topCreators" },
 ];

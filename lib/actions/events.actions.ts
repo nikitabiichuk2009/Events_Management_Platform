@@ -55,6 +55,11 @@ export async function createEvent({ userId, event, path }: CreateEventParams): P
       { $addToSet: { events: newEvent._id } }
     );
 
+    await User.updateOne(
+      { _id: organizer._id },
+      { $inc: { eventsCreatedCount: 1 } }
+    );
+
     revalidatePath(path);
 
   } catch (error) {
@@ -189,6 +194,11 @@ export async function deleteEventById(eventId: string): Promise<void> {
     await Order.deleteMany({ event: event._id });
 
     await Event.findByIdAndDelete(eventId);
+
+    await User.updateOne(
+      { _id: event.organizer },
+      { $inc: { eventsCreatedCount: -1 } }
+    );
 
     revalidatePath("/saved")
     revalidatePath("/")

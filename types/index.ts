@@ -4,6 +4,13 @@ import { IOrder } from "@/lib/database/models/order.model"
 import { IUser } from "@/lib/database/models/user.model"
 
 // ====== USER PARAMS
+export type GetAllUsersParams = {
+  query?: string;
+  filter?: "newUsers" | "oldUsers" | "topCreators";
+  page?: number;
+  limit?: number;
+};
+
 export type CreateUserParams = {
   clerkId: string
   firstName: string
@@ -124,10 +131,11 @@ export type GetRelatedEventsByCategoryParams = {
   limit?: number
   page: number | string
 }
+export type User = IUser & { _id: string }
 
-export type Event = IEvent & { _id: string } & { organizer: IUser & { _id: string } } & { category: ICategory & { _id: string } };
+export type Event = IEvent & { _id: string } & { organizer: User } & { category: ICategory & { _id: string } };
 
-export type Order = IOrder & { _id: string } & { event: Event } & { buyer: IUser & { _id: string } };
+export type Order = IOrder & { _id: string } & { event: Event } & { buyer: User };
 
 // ====== CATEGORY PARAMS
 export type GetAllCategoriesParams = {

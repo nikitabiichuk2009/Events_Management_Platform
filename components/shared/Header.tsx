@@ -19,7 +19,7 @@ const Header = () => {
           />
         </Link>
         <nav className="hidden md:flex md:justify-between md:items-center ml-4 lg:ml-0">
-          <NavItems otherClasses="text-sm lg:text-base" />
+          <NavItems otherClasses="text-xs lg:text-base" />
         </nav>
         <div className="flex justify-end w-32">
           <div className="mr-4 md:mr-0">

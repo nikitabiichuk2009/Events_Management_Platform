@@ -23,7 +23,7 @@ const NavItems = ({ otherClasses, isMobile = false }: { otherClasses?: string; i
             className={`${
               pathname === route
                 ? "text-primary-500"
-                : "text-black hover:text-primary-400 whitespace-nowrap transition-colors duration-200 ease-in-out"
+                : "text-black hover:text-primary-400 transition-colors duration-200 ease-in-out whitespace-nowrap"
             } font-medium`}
           >
             {link.label}

@@ -6,7 +6,7 @@ import User, { IUser } from "../database/models/user.model";
 import Order from "../database/models/order.model";
 import Category from "../database/models/category.model";
 import Event, { IEvent } from "../database/models/event.model";
-import { CreateUserParams, DeleteUserParams, GetEventsByUserParams, GetSavedEventsByUserParams, SaveEventParams, UpdateUserParams, GetUserTicketsParams } from "@/types";
+import { CreateUserParams, DeleteUserParams, GetEventsByUserParams, GetSavedEventsByUserParams, SaveEventParams, UpdateUserParams, GetUserTicketsParams, GetAllUsersParams } from "@/types";
 import { FilterQuery } from "mongoose";
 import { stringifyObject } from '@/lib/utils';
 import mongoose from "mongoose";
@@ -37,6 +37,7 @@ export async function updateUser(userData: UpdateUserParams): Promise<IUser> {
     );
     revalidatePath("/");
     revalidatePath(path);
+    revalidatePath("/community");
 
     return stringifyObject(updatedUser);
   } catch (err) {
@@ -435,5 +436,61 @@ export async function getUserOrganizedEventsAndOrders(clerkId: string) {
   } catch (err) {
     console.error("Error fetching user-organized events and orders:", err);
     throw new Error("Error fetching user-organized events and orders");
+  }
+}
+
+export async function getAllUsers({
+  query = "",
+  filter = "newUsers",
+  page = 1,
+  limit = 10,
+}: GetAllUsersParams): Promise<{
+  users: IUser[];
+  isNextPage: boolean;
+  totalUsersCount: number;
+}> {
+  try {
+    await connectToDB();
+
+    const skip = (page - 1) * limit;
+
+    const searchQuery: any = {};
+    if (query) {
+      searchQuery.$or = [
+        { username: { $regex: query, $options: "i" } },
+        { lastName: { $regex: query, $options: "i" } },
+        { firstName: { $regex: query, $options: "i" } },
+      ];
+    }
+
+    let sortOption = {};
+    switch (filter) {
+      case "newUsers":
+        sortOption = { joinDate: -1 }; 
+        break;
+      case "oldUsers":
+        sortOption = { joinDate: 1 };
+        break;
+      case "topCreators":
+        sortOption = { eventsCreatedCount: -1 }; 
+        break;
+      default:
+        sortOption = { joinDate: -1 };
+    }
+
+    const users = await User.find(searchQuery)
+      .sort(sortOption)
+      .skip(skip)
+      .limit(limit)
+      .select("_id clerkId username firstName lastName photo eventsCreatedCount")
+      .exec();
+
+    const totalUsersCount = await User.countDocuments(searchQuery);
+    const isNextPage = totalUsersCount > skip + users.length;
+
+    return { users, isNextPage, totalUsersCount };
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    throw new Error("Error fetching users");
   }
 }
