@@ -86,12 +86,7 @@ const Dropdown = ({
             </SelectItem>
           ))}
           <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <AlertDialogTrigger
-              className="p-medium-14 flex w-full py-3 pl-8 text-primary-500 hover:text-primary-400 duration-200 transition-colors ease-in-out"
-              onClick={() => {
-                setIsDialogOpen(true);
-              }}
-            >
+            <AlertDialogTrigger className="p-medium-14 flex w-full py-3 pl-8 text-primary-500 hover:text-primary-400 duration-200 transition-colors ease-in-out">
               Add Category
             </AlertDialogTrigger>
             <AlertDialogContent className="bg-gray-50">
