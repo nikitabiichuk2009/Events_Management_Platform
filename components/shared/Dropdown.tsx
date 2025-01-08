@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Select,
   SelectContent,
@@ -38,6 +38,14 @@ const Dropdown = ({
   const [newCategory, setNewCategory] = useState<string>("");
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isDialogOpen && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isDialogOpen]);
 
   const handleAddCategory = () => {
     const trimmedCategory = newCategory.trim();
@@ -86,6 +94,7 @@ const Dropdown = ({
                 <AlertDialogTitle>New Category</AlertDialogTitle>
                 <AlertDialogDescription>
                   <Input
+                    ref={inputRef}
                     value={newCategory}
                     placeholder="Category Name"
                     className="input-field text-black"
