@@ -81,7 +81,10 @@ const Dropdown = ({
               className="p-medium-14 flex w-full py-3 pl-8 text-primary-500 hover:text-primary-400 duration-200 transition-colors ease-in-out"
               onClick={() => {
                 setIsDialogOpen(true);
-                inputRef.current?.focus();
+            
+                setTimeout(() => {
+                  inputRef.current?.focus();
+                }, 250);
               }}
             >
               Add Category
