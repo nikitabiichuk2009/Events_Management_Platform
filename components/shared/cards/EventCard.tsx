@@ -56,7 +56,7 @@ export default function EventCard({
     <div className="shadow-lg rounded-xl overflow-hidden">
       <div
         className={`bg-primary-50 relative border-black/[0.1] ${
-          dateOfPurchase || hasOrderLink ? "h-[35rem]" : "h-[33rem]"
+          dateOfPurchase || hasOrderLink ? "h-[35.5rem]" : "h-[33.5rem]"
         } rounded-xl p-6 border`}
       >
         <div className="text-lg font-bold text-neutral-600 dark:text-white flex flex-row gap-4 items-center">

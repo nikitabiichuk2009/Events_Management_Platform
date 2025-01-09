@@ -46,7 +46,7 @@ const ProfilePageLoading = () => {
             {Array.from({ length: 3 }).map((_, idx) => (
               <Skeleton
                 key={idx}
-                className="h-[32rem] w-full md:w-[21rem] lg:w-[23rem] rounded-xl"
+                className="h-[33.5rem] w-full md:w-[21rem] lg:w-[23rem] rounded-xl"
               />
             ))}
           </div>
@@ -85,7 +85,7 @@ const ProfilePageLoading = () => {
             {Array.from({ length: 3 }).map((_, idx) => (
               <Skeleton
                 key={idx}
-                className="h-[32rem] w-full md:w-[21rem] lg:w-[23rem] rounded-xl"
+                className="h-[33.5rem] w-full md:w-[21rem] lg:w-[23rem] rounded-xl"
               />
             ))}
           </div>
