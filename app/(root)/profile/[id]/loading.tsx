@@ -32,7 +32,7 @@ const ProfilePageLoading = () => {
 
       <section id="profile-tickets" className="bg-primary-50">
         <div className="wrapper">
-          <div>
+          <div className="flex flex-col gap-4 text-center sm:text-left">
             <h2 className="h2-bold">Loading Tickets...</h2>
             <p className="p-regular-18 text-primary-400">
               Please wait while we load user's tickets.
@@ -71,7 +71,7 @@ const ProfilePageLoading = () => {
 
       <section id="profile-organized-events" className="mt-8 bg-primary-50">
         <div className="wrapper">
-          <div>
+          <div className="flex flex-col gap-4 text-center sm:text-left">
             <h2 className="h2-bold">Loading Organized Events...</h2>
             <p className="p-regular-18 text-primary-400">
               Please wait while we load user's organized events.
