@@ -337,6 +337,12 @@ export async function getRelatedEvents({
       case "recent":
         sortOption = { createdAt: -1 };
         break;
+      case "name":
+        sortOption = { title: 1 };
+        break;
+      case "old":
+        sortOption = { createdAt: 1 };
+        break;
       case "free":
         searchQuery.isFree = true;
         sortOption = { createdAt: -1 };

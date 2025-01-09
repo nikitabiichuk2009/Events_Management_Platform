@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import React from "react";
-import { CardBody, CardContainer, CardItem } from "@/components/ui/3d-card";
 import Link from "next/link";
 import { Event } from "@/types";
 import { formatDateTime } from "@/lib/utils";
@@ -52,17 +51,15 @@ export default function EventCard({
       });
     }
   };
+
   return (
-    <CardContainer className="shadow-lg rounded-xl overflow-hidden">
-      <CardBody
-        className={`bg-primary-50 relative group/card border-black/[0.1] ${
+    <div className="shadow-lg rounded-xl overflow-hidden">
+      <div
+        className={`bg-primary-50 relative border-black/[0.1] ${
           dateOfPurchase || hasOrderLink ? "h-[35rem]" : "h-[33rem]"
-        } w-[23rem] rounded-xl p-6 border`}
+        } rounded-xl p-6 border`}
       >
-        <CardItem
-          className="text-lg font-bold text-neutral-600 dark:text-white flex flex-row gap-4 items-center"
-          as={"div"}
-        >
+        <div className="text-lg font-bold text-neutral-600 dark:text-white flex flex-row gap-4 items-center">
           <p
             className={`whitespace-nowrap line-clamp-1 ${
               userClerkId === event.organizer.clerkId
@@ -111,59 +108,29 @@ export default function EventCard({
               </AlertDialog>
             </div>
           )}
-        </CardItem>
-        {/* To attract user to go to the event page, probably it is better to not show the some info */}
-        {/* <CardItem
-          as="p"
-          className="text-primary-400 font-medium text-sm max-w-sm mt-2 font-spaceGrotesk"
-        >
-          {event.description}
-        </CardItem> */}
-        <CardItem className="w-full mt-4">
-          <Image
-            src={event.imageUrl}
-            height={1000}
-            width={1000}
-            className="h-56 w-full object-cover rounded-xl"
-            alt={event.title}
-          />
+        </div>
+        <div className="w-full mt-4">
+          <div className="relative h-56 w-full overflow-hidden rounded-xl">
+            <Image
+              src={event.imageUrl}
+              alt={event.title}
+              layout="fill"
+              className="object-cover"
+            />
+          </div>
           <div className="flex flex-col gap-5 mt-4">
-            <CardItem as="div" className="flex gap-2 md:gap-3 items-center">
+            <div className="flex gap-2 md:gap-3 items-center">
               <Image
                 src="/assets/icons/calendar.svg"
                 alt="calendar"
                 width={18}
                 height={18}
               />
-              <p className="p-medium-14">
+              <p className="p-medium-16 md:p-medium-14">
                 {formatDateTime(event.startDateTime)} -{" "}
                 {formatDateTime(event.endDateTime)}
               </p>
-            </CardItem>
-            {/* <CardItem as="div" className="flex gap-2 md:gap-3 items-center">
-              <Image
-                src="/assets/icons/location.svg"
-                alt="location"
-                width={18}
-                height={18}
-              />
-              <p className="p-medium-14">{event.location}</p>
-            </CardItem> */}
-            {/* <CardItem
-              as={Link}
-              href={event.url}
-              className="flex gap-2 md:gap-3 items-center"
-            >
-              <Image
-                src="/assets/icons/link.svg"
-                alt="link"
-                width={16}
-                height={16}
-              />
-              <p className="p-medium-14 text-primary-400 hover:text-primary-500 ease-in-out duration-300 transition-colors">
-                {event.url}
-              </p>
-            </CardItem> */}
+            </div>
           </div>
           <div className="flex gap-3 items-center mt-4">
             <p
@@ -192,16 +159,15 @@ export default function EventCard({
               Purchased on: {formatDateTime(dateOfPurchase)}
             </p>
           )}
-        </CardItem>
+        </div>
         <div className="flex justify-between items-center mt-8">
           <div className="flex flex-col gap-2">
-            <CardItem
-              as={Link}
+            <Link
               href={`/profile/${event.organizer.clerkId}`}
-              className="px-4 py-2 rounded-xl text-sm font-normal text-grey-500"
+              className="px-4 py-2 rounded-xl"
             >
               <div className="flex flex-row gap-2 items-center">
-                <div className="relative size-6 rounded-full">
+                <div className="relative size-8 md:size-6 rounded-full">
                   <Image
                     src={event.organizer.photo!}
                     alt={event.organizer.username}
@@ -209,26 +175,25 @@ export default function EventCard({
                     className="rounded-full object-cover"
                   />
                 </div>
-                @{event.organizer.username}
+                <p className="p-medium-16 md:p-medium-14 text-grey-500">@{event.organizer.username}</p>
               </div>
-            </CardItem>
+            </Link>
             {hasOrderLink && (
-              <CardItem
-                as={Link}
+              <Link
                 href={`/orders?eventId=${event._id}`}
                 className="text-primary-400 hover:text-primary-500 ease-in-out duration-300 transition-colors px-4"
               >
                 Order Info -&gt;
-              </CardItem>
+              </Link>
             )}
           </div>
-          <CardItem as={Link} href={`/events/${event._id}`}>
+          <Link href={`/events/${event._id}`}>
             <Button className="rounded-full text-xs px-4 py-[1.5]">
               Details -&gt;
             </Button>
-          </CardItem>
+          </Link>
         </div>
-      </CardBody>
-    </CardContainer>
+      </div>
+    </div>
   );
 }

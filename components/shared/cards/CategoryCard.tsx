@@ -12,11 +12,11 @@ const CategoryCard = ({ id, name, eventCount }: Props) => {
   return (
     <div className="w-full md:w-[260px] bg-white">
       <Link href={`/categories/${id}`}>
-        <div className="flex h-[150px] flex-col justify-start shadow-lg gap-[18px] rounded-2xl border p-8">
+        <div className="flex h-[150px] flex-col justify-start shadow-lg gap-[18px] rounded-xl border p-8">
           <Badge className= "w-fit rounded-md border-none px-4 py-2 text-white bg-primary-400 line-clamp-1">
             {name}
           </Badge>
-          <p className="p-regular-18 text-dark200_light900">
+          <p className="p-regular-18">
             <span className="text-[20px] font-bold text-primary-500">
               {eventCount}+{" "}
             </span>

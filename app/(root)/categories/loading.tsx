@@ -17,11 +17,11 @@ const CategoriesLoading = () => {
           <Skeleton className="h-14 w-full rounded-xl" />
           <Skeleton className="min-h-14 sm:min-w-[170px] rounded-md" />
         </div>
-        <div className="mt-12 flex flex-wrap gap-5 2xl:gap-8 items-center max-md:justify-center">
+        <div className="mt-8 flex flex-wrap gap-4">
           {Array.from({ length: 3 }).map((_, idx) => (
             <Skeleton
               key={idx}
-              className="h-[32rem] w-[25rem] rounded-xl"
+              className="w-full md:w-[260px] h-[150px] rounded-xl"
             />
           ))}
         </div>

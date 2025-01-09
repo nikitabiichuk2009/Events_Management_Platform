@@ -24,12 +24,12 @@ const EventsCollection = async ({
   const { userId } = await auth();
 
   return data.length > 0 ? (
-    <ul className="flex flex-wrap gap-8 items-center max-md:justify-center mt-12">
+    <ul className="flex flex-wrap gap-4 lg:gap-8 items-center max-md:justify-center mt-12">
       {collectionType === "All_Tickets" &&
         data.every((item) => "buyer" in item) &&
         data.map((order: Order) => {
           return (
-            <li key={order._id} className="m-0 p-0">
+            <li key={order._id} className="w-full md:w-[21rem] lg:w-[23rem]">
               <EventCard
                 event={order.event}
                 hasOrderLink={false}
@@ -46,7 +46,7 @@ const EventsCollection = async ({
         data.map((event: Event) => {
           const hasOrderLink = collectionType === "Events_Organized" && event.organizer.clerkId === userId;
           return (
-            <li key={event._id} className="m-0 p-0">
+            <li key={event._id} className="w-full md:w-[21rem] lg:w-[23rem]">
               <EventCard
                 event={event}
                 hasOrderLink={hasOrderLink}

@@ -16,7 +16,7 @@ const ProfilePageLoading = () => {
             <div>
               <h2 className="h2-bold">Please wait...</h2>
               <p className="p-regular-18 text-grey-400">
-              Loading user profile...
+                Loading user profile...
               </p>
             </div>
           </div>
@@ -42,11 +42,11 @@ const ProfilePageLoading = () => {
             <Skeleton className="h-14 w-full rounded-xl bg-slate-200" />
             <Skeleton className="min-h-14 sm:min-w-[170px] rounded-md bg-slate-200" />
           </div>
-          <div className="mt-12 flex flex-wrap gap-5 items-center max-md:justify-center">
+          <div className="flex flex-wrap gap-4 lg:gap-8 items-center max-md:justify-center mt-12">
             {Array.from({ length: 3 }).map((_, idx) => (
               <Skeleton
                 key={idx}
-                className="h-[32rem] w-[25rem] rounded-xl bg-slate-200"
+                className="h-[32rem] w-full md:w-[21rem] lg:w-[23rem] rounded-xl"
               />
             ))}
           </div>
@@ -81,11 +81,11 @@ const ProfilePageLoading = () => {
             <Skeleton className="h-14 w-full rounded-xl bg-slate-200" />
             <Skeleton className="min-h-14 sm:min-w-[170px] rounded-md bg-slate-200" />
           </div>
-          <div className="mt-12 flex flex-wrap gap-5 items-center max-md:justify-center">
+          <div className="flex flex-wrap gap-4 lg:gap-8 items-center max-md:justify-center mt-12">
             {Array.from({ length: 3 }).map((_, idx) => (
               <Skeleton
                 key={idx}
-                className="h-[32rem] w-[25rem] rounded-xl bg-slate-200"
+                className="h-[32rem] w-full md:w-[21rem] lg:w-[23rem] rounded-xl"
               />
             ))}
           </div>

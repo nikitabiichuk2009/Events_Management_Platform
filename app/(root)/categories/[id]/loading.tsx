@@ -19,9 +19,12 @@ export default function CategoryPageLoading() {
           <Skeleton className="h-14 sm:w-[170px] rounded-md" />
         </div>
 
-        <div className="mt-12 flex flex-wrap gap-5 2xl:gap-8 items-center max-md:justify-center">
+        <div className="flex flex-wrap gap-4 lg:gap-8 items-center max-md:justify-center mt-12">
           {Array.from({ length: 3 }).map((_, idx) => (
-            <Skeleton key={idx} className="h-[32rem] w-[25rem] rounded-xl" />
+            <Skeleton
+              key={idx}
+              className="h-[32rem] w-full md:w-[21rem] lg:w-[23rem] rounded-xl"
+            />
           ))}
         </div>
 
