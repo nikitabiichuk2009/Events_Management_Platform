@@ -5,7 +5,7 @@ import User from "../database/models/user.model";
 import Event from "../database/models/event.model";
 import Category from "../database/models/category.model";
 import { CreateEventParams, GetAllEventsParams, UpdateEventParams } from "@/types";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, unstable_cache } from "next/cache";
 import Order from "../database/models/order.model";
 
 export async function createEvent({ userId, event, path }: CreateEventParams): Promise<void> {
@@ -61,6 +61,10 @@ export async function createEvent({ userId, event, path }: CreateEventParams): P
     );
 
     revalidatePath(path);
+    revalidatePath("/community")
+    revalidatePath(`/profile/${organizer._id.toString()}`);
+    revalidatePath("/categories");
+    revalidatePath(`/categories/${category._id.toString()}`);
 
   } catch (error) {
     console.error("Error creating event:", error);
@@ -162,6 +166,13 @@ export async function updateEvent({
     );
 
     revalidatePath(path);
+    revalidatePath("/community")
+    revalidatePath(`/profile/${existingEvent.organizer._id.toString()}`);
+    revalidatePath("/categories");
+    revalidatePath(`/categories/${newCategory._id.toString()}`);
+    revalidatePath(`/events/${updatedEvent._id.toString()}`);
+    revalidatePath("/saved");
+
   } catch (error) {
     console.error("Error updating event:", error);
     throw new Error("Error updating event");
@@ -202,8 +213,13 @@ export async function deleteEventById(eventId: string): Promise<void> {
 
     revalidatePath("/saved")
     revalidatePath("/")
+    revalidatePath("/categories")
+    revalidatePath("/community")
+    revalidatePath("/orders")
     revalidatePath(`/categories/${event.category._id.toString()}`)
     revalidatePath(`/events/${event._id.toString()}`)
+    revalidatePath(`/profile/${event.organizer._id.toString()}`)
+
 
     console.log(`Event with ID ${eventId} deleted successfully.`);
   } catch (error) {
@@ -222,84 +238,99 @@ export async function getAllEvents({
   isNextPage: boolean;
   totalEventsCount: number;
 }> {
-  try {
-    await connectToDB();
-    const skip = (page - 1) * limit;
+  const cachedGetAllEvents = unstable_cache(
+    async ({ query, category, limit, page }: GetAllEventsParams) => {
+      try {
+        await connectToDB();
+        const skip = (page - 1) * limit;
 
-    const searchQuery: any = {};
-    if (query) {
-      searchQuery["$or"] = [
-        { "title": { $regex: query, $options: "i" } },
-        { "description": { $regex: query, $options: "i" } },
-      ];
-    }
+        const searchQuery: any = {};
+        if (query) {
+          searchQuery["$or"] = [
+            { title: { $regex: query, $options: "i" } },
+            { description: { $regex: query, $options: "i" } },
+          ];
+        }
 
-    let sortOption = {};
-    switch (category) {
-      case "popular":
-        sortOption = { savedCount: -1, createdAt: -1 };
-        break;
-      case "recent":
-        sortOption = { createdAt: -1 };
-        break;
-      case "name":
-        sortOption = { name: 1 };
-        break;
-      case "old":
-        sortOption = { createdAt: 1 };
-        break;
-      case "free":
-        searchQuery.isFree = true;
-        sortOption = { createdAt: -1 };
-        break;
-      case "cheapest":
-        sortOption = { price: 1 };
-        break;
-      case "most-expensive":
-        sortOption = { price: -1 };
-        break;
-      default:
-        sortOption = { createdAt: -1 };
-        break;
-    }
+        let sortOption = {};
+        switch (category) {
+          case "popular":
+            sortOption = { savedCount: -1, createdAt: -1 };
+            break;
+          case "recent":
+            sortOption = { createdAt: -1 };
+            break;
+          case "name":
+            sortOption = { name: 1 };
+            break;
+          case "old":
+            sortOption = { createdAt: 1 };
+            break;
+          case "free":
+            searchQuery.isFree = true;
+            sortOption = { createdAt: -1 };
+            break;
+          case "cheapest":
+            sortOption = { price: 1 };
+            break;
+          case "most-expensive":
+            sortOption = { price: -1 };
+            break;
+          default:
+            sortOption = { createdAt: -1 };
+            break;
+        }
 
-    const allEvents = await Event.find(searchQuery)
-      .sort(sortOption)
-      .skip(skip)
-      .limit(limit)
-      .populate({ path: "organizer", select: "clerkId username photo", model: User })
-      .populate({ path: "category", select: "_id name", model: Category })
-      .exec();
+        const allEvents = await Event.find(searchQuery)
+          .sort(sortOption)
+          .skip(skip)
+          .limit(limit)
+          .populate({ path: "organizer", select: "clerkId username photo", model: User })
+          .populate({ path: "category", select: "_id name", model: Category })
+          .exec();
 
-    const totalEventsCount = await Event.countDocuments(searchQuery);
-    const totalEventsCountWithoutQuery = await Event.countDocuments();
-    const isNextPage = totalEventsCount > skip + allEvents.length;
+        const totalEventsCount = await Event.countDocuments(searchQuery);
+        const isNextPage = totalEventsCount > skip + allEvents.length;
 
-    return { allEvents, isNextPage, totalEventsCount: totalEventsCountWithoutQuery };
-  } catch (err: any) {
-    console.error("Error fetching all events:", err);
-    throw new Error("Error fetching all events");
-  }
+        return { allEvents, isNextPage, totalEventsCount };
+      } catch (err: any) {
+        console.error("Error fetching all events:", err);
+        throw new Error("Error fetching all events");
+      }
+    },
+    ["all_events"],
+    { revalidate: 600 }
+  );
+
+  return cachedGetAllEvents({ query, category, limit, page });
 }
 
 export async function getEventById(eventId: string) {
-  try {
-    await connectToDB();
+  const cachedGetEventById = unstable_cache(
+    async (eventId: string) => {
+      try {
+        await connectToDB();
 
-    const event = await Event.findById(eventId)
-      .populate({ path: "organizer", select: "clerkId username photo firstName lastName", model: User })
-      .populate({ path: "category", select: "_id name", model: Category })
-      .exec();
+        const event = await Event.findById(eventId)
+          .populate({ path: "organizer", select: "clerkId username photo firstName lastName", model: User })
+          .populate({ path: "category", select: "_id name", model: Category })
+          .exec();
 
-    if (!event) {
-      throw new Error("Event not found");
-    }
+        if (!event) {
+          throw new Error("Event not found");
+        }
 
-    return event;
-  } catch (err) {
-    console.error("Error fetching event by ID:", err);
-    throw new Error("Error fetching event by ID");
-  }
+        return event;
+      } catch (err) {
+        console.error("Error fetching event by ID:", err);
+        throw new Error("Error fetching event by ID");
+      }
+    },
+    ["event_by_id"],
+    { revalidate: 600 }
+  );
+
+  return cachedGetEventById(eventId);
 }
 
 export async function getRelatedEvents({
@@ -313,64 +344,87 @@ export async function getRelatedEvents({
   events: Event[];
   isNext: boolean;
 }> {
-  try {
-    await connectToDB();
+  const cachedGetRelatedEvents = unstable_cache(
+    async ({
+      categoryId,
+      currentEventId,
+      query,
+      category,
+      page,
+      limit,
+    }: GetAllEventsParams & { categoryId: string; currentEventId: string }) => {
+      try {
+        await connectToDB();
 
-    const skip = (page - 1) * limit;
-    const searchQuery: any = {
-      category: categoryId,
-      _id: { $ne: currentEventId }, // Exclude the current event
-    };
+        const skip = (page - 1) * limit;
+        const searchQuery: any = {
+          category: categoryId,
+          _id: { $ne: currentEventId }, // Exclude the current event
+        };
 
-    if (query) {
-      searchQuery["$or"] = [
-        { "title": { $regex: query, $options: "i" } },
-        { "description": { $regex: query, $options: "i" } },
-      ];
-    }
+        if (query) {
+          searchQuery["$or"] = [
+            { title: { $regex: query, $options: "i" } },
+            { description: { $regex: query, $options: "i" } },
+          ];
+        }
 
-    let sortOption = {};
-    switch (category) {
-      case "popular":
-        sortOption = { savedCount: -1, createdAt: -1 };
-        break;
-      case "recent":
-        sortOption = { createdAt: -1 };
-        break;
-      case "name":
-        sortOption = { title: 1 };
-        break;
-      case "old":
-        sortOption = { createdAt: 1 };
-        break;
-      case "free":
-        searchQuery.isFree = true;
-        sortOption = { createdAt: -1 };
-        break;
-      case "cheapest":
-        sortOption = { price: 1 };
-        break;
-      case "most-expensive":
-        sortOption = { price: -1 };
-        break;
-      default:
-        sortOption = { createdAt: -1 };
-        break;
-    }
-    const events = await Event.find(searchQuery)
-      .sort(sortOption)
-      .skip(skip)
-      .limit(limit)
-      .populate({ path: "organizer", select: "clerkId username photo", model: User })
-      .populate({ path: "category", select: "_id name", model: Category })
-      .exec();
+        let sortOption = {};
+        switch (category) {
+          case "popular":
+            sortOption = { savedCount: -1, createdAt: -1 };
+            break;
+          case "recent":
+            sortOption = { createdAt: -1 };
+            break;
+          case "name":
+            sortOption = { title: 1 };
+            break;
+          case "old":
+            sortOption = { createdAt: 1 };
+            break;
+          case "free":
+            searchQuery.isFree = true;
+            sortOption = { createdAt: -1 };
+            break;
+          case "cheapest":
+            sortOption = { price: 1 };
+            break;
+          case "most-expensive":
+            sortOption = { price: -1 };
+            break;
+          default:
+            sortOption = { createdAt: -1 };
+            break;
+        }
 
-    const totalCount = await Event.countDocuments(searchQuery);
-    const isNextPage = totalCount > skip + events.length;
+        const events = await Event.find(searchQuery)
+          .sort(sortOption)
+          .skip(skip)
+          .limit(limit)
+          .populate({ path: "organizer", select: "clerkId username photo", model: User })
+          .populate({ path: "category", select: "_id name", model: Category })
+          .exec();
 
-    return { events, isNext: isNextPage };
-  } catch (err) {
-    console.error("Error fetching related events:", err);
-    throw new Error("Error fetching related events");
-  }
+        const totalCount = await Event.countDocuments(searchQuery);
+        const isNextPage = totalCount > skip + events.length;
+
+        return { events, isNext: isNextPage };
+      } catch (err) {
+        console.error("Error fetching related events:", err);
+        throw new Error("Error fetching related events");
+      }
+    },
+    ["related_events", categoryId],
+    { revalidate: 600 }
+  );
+
+  return cachedGetRelatedEvents({
+    categoryId,
+    currentEventId,
+    query,
+    category,
+    page,
+    limit,
+  });
 }

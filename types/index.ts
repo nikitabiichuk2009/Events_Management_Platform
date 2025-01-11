@@ -5,10 +5,10 @@ import { IUser } from "@/lib/database/models/user.model"
 
 // ====== USER PARAMS
 export type GetAllUsersParams = {
-  query?: string;
-  filter?: "newUsers" | "oldUsers" | "topCreators";
-  page?: number;
-  limit?: number;
+  query: string;
+  filter: "newUsers" | "oldUsers" | "topCreators";
+  page: number;
+  limit: number;
 };
 
 export type CreateUserParams = {
@@ -43,16 +43,24 @@ export type GetEventsByUserParams = {
   category?: string
 }
 
+export type GetUserOrganizedEventsParams = {
+  userId: string
+  limit: number
+  page: number
+  query: string
+  category: string
+}
+
 export type DeleteUserParams = {
   clerkId: string
 }
 
 export type GetUserTicketsParams = {
   userId: string;
-  query?: string;
-  category?: string;
-  limit?: number;
-  page?: number;
+  query: string;
+  category: string;
+  limit: number;
+  page: number;
 }
 
 export interface GetUserStatsParams {
@@ -111,18 +119,18 @@ export type DeleteEventParams = {
 }
 
 export type GetAllEventsParams = {
-  query?: string
-  category?: string
-  limit?: number
-  page?: number
+  query: string
+  category: string
+  limit: number
+  page: number
 }
 
 export type GetSavedEventsByUserParams = {
   clerkId: string;
-  query?: string;
-  category?: string;
-  limit?: number;
-  page?: number;
+  query: string;
+  category: string;
+  limit: number;
+  page: number;
 }
 
 export type GetRelatedEventsByCategoryParams = {
@@ -148,10 +156,10 @@ export type GetAllCategoriesParams = {
 
 export type GetEventsByCategoryIdParams = {
   categoryId: string
-  query?: string
-  filter?: string
-  page?: number
-  limit?: number
+  query: string
+  filter: string
+  page: number
+  limit: number
 }
 // ====== ORDER PARAMS
 export type CheckoutOrderParams = {
@@ -168,6 +176,7 @@ export type CreateOrderParams = {
   stripeId: string
   eventId: string
   buyerId: string
+  buyerClerkId: string
   totalAmount: number
   createdAt: Date
 }

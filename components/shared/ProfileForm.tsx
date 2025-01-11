@@ -45,7 +45,11 @@ const ProfileForm = ({ userId, initialValues }: ProfileFormProps) => {
 
     setIsSubmitting(true);
     try {
-      await updateUser({clerkId: userId, updateData: values, path: `/profile/${userId}`});
+      await updateUser({
+        clerkId: userId,
+        updateData: values,
+        path: `/profile/${userId}`,
+      });
       toast({
         title: "Profile updated successfully",
         description: "Your profile changes have been saved.",

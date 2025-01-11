@@ -30,6 +30,7 @@ export async function POST(request: Request) {
       stripeId: id,
       eventId: metadata?.eventId || '',
       buyerId: metadata?.buyerId || '',
+      buyerClerkId: metadata?.buyerClerkId || '',
       totalAmount: amount_total ? parseFloat(amount_total.toString()) / 100 : 0,
       createdAt: new Date(),
     }

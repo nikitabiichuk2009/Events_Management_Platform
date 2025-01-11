@@ -5,6 +5,7 @@ import Stripe from 'stripe';
 import { stringifyObject } from './../utils';
 import { connectToDB } from "../database";
 import Order from "../database/models/order.model";
+import { revalidatePath } from "next/cache";
 
 export async function checkoutOrder(order: CheckoutOrderParams) {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
@@ -28,6 +29,7 @@ export async function checkoutOrder(order: CheckoutOrderParams) {
       metadata: {
         eventId: order.eventId,
         buyerId: order.buyerId,
+        buyerClerkId: order.buyerClerkId
       },
       mode: 'payment',
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/profile/${order.buyerClerkId}#profile-tickets`,
@@ -43,14 +45,16 @@ export async function checkoutOrder(order: CheckoutOrderParams) {
 export async function createOrder(order: CreateOrderParams) {
   try {
     await connectToDB();
-    console.log(order);
 
     const newOrder = await Order.create({
       ...order,
       event: order.eventId,
       buyer: order.buyerId,
     });
-    console.log(newOrder);
+    revalidatePath("/orders");
+    revalidatePath(`/events/${order.eventId}`);
+    revalidatePath(`/profile/${order.buyerClerkId}`);
+
     return stringifyObject(newOrder);
   } catch (error) {
     console.error(error);
