@@ -12,7 +12,7 @@ export async function createEvent({ userId, event, path }: CreateEventParams): P
   try {
     await connectToDB();
 
-    const organizer = await User.findById(userId);
+    const organizer = await User.findById(userId).select("clerkId _id");
     if (!organizer) {
       throw new Error("Organizer not found");
     }
@@ -62,7 +62,7 @@ export async function createEvent({ userId, event, path }: CreateEventParams): P
 
     revalidatePath(path);
     revalidatePath("/community")
-    revalidatePath(`/profile/${organizer._id.toString()}`);
+    revalidatePath(`/profile/${organizer.clerkId}`);
     revalidatePath("/categories");
     revalidatePath(`/categories/${category._id.toString()}`);
 
@@ -82,7 +82,7 @@ export async function updateEvent({
 
     const existingEvent = await Event.findById(event._id).populate({
       path: "organizer",
-      select: "clerkId",
+      select: "clerkId _id",
       model: User,
     }).populate({
       path: "category",
@@ -167,7 +167,7 @@ export async function updateEvent({
 
     revalidatePath(path);
     revalidatePath("/community")
-    revalidatePath(`/profile/${existingEvent.organizer._id.toString()}`);
+    revalidatePath(`/profile/${existingEvent.organizer.clerkId}`);
     revalidatePath("/categories");
     revalidatePath(`/categories/${newCategory._id.toString()}`);
     revalidatePath(`/events/${updatedEvent._id.toString()}`);
@@ -206,8 +206,12 @@ export async function deleteEventById(eventId: string): Promise<void> {
 
     await Event.findByIdAndDelete(eventId);
 
-    await User.updateOne(
-      { _id: event.organizer },
+    const organizer = await User.findById(event.organizer._id).select("clerkId _id");
+    if (!organizer) {
+      throw new Error("Organizer not found");
+    }
+    await organizer.updateOne(
+      { _id: organizer._id },
       { $inc: { eventsCreatedCount: -1 } }
     );
 
@@ -218,7 +222,7 @@ export async function deleteEventById(eventId: string): Promise<void> {
     revalidatePath("/orders")
     revalidatePath(`/categories/${event.category._id.toString()}`)
     revalidatePath(`/events/${event._id.toString()}`)
-    revalidatePath(`/profile/${event.organizer._id.toString()}`)
+    revalidatePath(`/profile/${organizer.clerkId}`)
 
 
     console.log(`Event with ID ${eventId} deleted successfully.`);
