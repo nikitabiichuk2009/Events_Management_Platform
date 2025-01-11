@@ -36,7 +36,6 @@ export default function DataTable<TData, TValue>({
   data,
   eventIdFilter,
 }: DataTableProps<TData, TValue>) {
-  console.log(eventIdFilter);
   const [globalFilter, setGlobalFilter] = useState<string>("");
   const searchParams = useSearchParams();
   const router = useRouter();
