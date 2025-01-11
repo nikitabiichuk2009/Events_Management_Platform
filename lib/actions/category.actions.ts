@@ -60,7 +60,7 @@ export async function getAllCategories(params: GetAllCategoriesParams): Promise<
       }
     },
     ["all_categories"],
-    { revalidate: 600 }
+    { tags: ["all_categories"], revalidate: 600 }
   );
 
   return cachedGetAllCategories(params);
@@ -145,7 +145,7 @@ export async function getEventsByCategoryId({
       }
     },
     ["events_by_category"],
-    { revalidate: 600 }
+    { tags: ["events_by_category"], revalidate: 600 }
   );
 
   return cachedGetEventsByCategoryId({ categoryId, query, filter, page, limit });

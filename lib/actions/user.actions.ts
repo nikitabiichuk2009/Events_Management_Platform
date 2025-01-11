@@ -126,8 +126,8 @@ export async function getUserCategories(userId: string): Promise<{ name: string;
         throw new Error("Error fetching user categories");
       }
     },
-    ["user_categories", userId],
-    { revalidate: 600 }
+    ["user_categories"],
+    { tags: ["user_categories"], revalidate: 600 }
   );
 
   return cachedGetUserCategories(userId);
@@ -197,8 +197,8 @@ export async function getUserOrganizedEvents({
 
       return { events, isNextPage, totalOrganizedEventsCount };
     },
-    ["user_organized_events", userId],
-    { revalidate: 600 }
+    ["user_organized_events"],
+    { tags: ["user_organized_events"], revalidate: 600 }
   );
 
   return cachedGetUserOrganizedEvents({ userId, query, category, page, limit });
@@ -303,7 +303,7 @@ export async function getUserTickets({
       }
     },
     ["user_tickets"],
-    { revalidate: 600 }
+    { tags: ["user_tickets"], revalidate: 600 }
   );
 
   return cachedGetUserTickets({ userId, query, category, limit, page });
@@ -322,8 +322,8 @@ export async function getUserByClerkId(clerkId: string, shouldPopulateSavedEvent
       }
       return user;
     },
-    ["user_by_clerk_id", clerkId],
-    { revalidate: 600 }
+    ["user_by_clerk_id"],
+    { tags: ["user_by_clerk_id"], revalidate: 600 }
   );
 
   return cachedGetUserByClerkId(clerkId);
@@ -452,8 +452,8 @@ export async function getUserSavedEventsByClerkId({
         throw new Error("Error fetching saved events");
       }
     },
-    ["user_saved_events_by_clerk_id", clerkId],
-    { revalidate: 600 }
+    ["user_saved_events_by_clerk_id"],
+    { tags: ["user_saved_events_by_clerk_id"], revalidate: 600 }
   );
 
   return cachedGetUserSavedEventsByClerkId({ clerkId, query, category, limit, page });
@@ -503,8 +503,8 @@ export async function getUserOrganizedEventsAndOrders(clerkId: string) {
         throw new Error("Error fetching user-organized events and orders");
       }
     },
-    ["organized_events_and_orders", clerkId],
-    { revalidate: 600 }
+    ["organized_events_and_orders"],
+    { tags: ["organized_events_and_orders"], revalidate: 600 }
   );
 
   return cachedGetUserOrganizedEventsAndOrders(clerkId);
@@ -563,7 +563,7 @@ export async function getAllUsers({
       return { users, isNextPage, totalUsersCount };
     },
     ["all_users"],
-    { revalidate: 600 }
+    { tags: ["all_users"], revalidate: 600 }
   );
 
   return cachedGetAllUsers({ query, filter, page, limit });

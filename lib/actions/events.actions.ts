@@ -165,13 +165,13 @@ export async function updateEvent({
       { $addToSet: { events: updatedEvent._id } }
     );
 
+    revalidateTag("user_tickets");
     revalidatePath(path);
     revalidatePath("/community")
     revalidatePath(`/profile/${existingEvent.organizer.clerkId}`);
     revalidatePath("/categories");
     revalidatePath(`/categories/${newCategory._id.toString()}`);
     revalidatePath(`/events/${updatedEvent._id.toString()}`);
-    revalidateTag("user_tickets");
     revalidatePath("/saved");
 
   } catch (error) {
@@ -304,7 +304,7 @@ export async function getAllEvents({
       }
     },
     ["all_events"],
-    { revalidate: 600 }
+    { tags: ["all_events"], revalidate: 600 }
   );
 
   return cachedGetAllEvents({ query, category, limit, page });
@@ -332,7 +332,7 @@ export async function getEventById(eventId: string) {
       }
     },
     ["event_by_id"],
-    { revalidate: 600 }
+    { tags: ["event_by_id"], revalidate: 600 }
   );
 
   return cachedGetEventById(eventId);
@@ -420,8 +420,8 @@ export async function getRelatedEvents({
         throw new Error("Error fetching related events");
       }
     },
-    ["related_events", categoryId],
-    { revalidate: 600 }
+    ["related_events"],
+    { tags: ["related_events"], revalidate: 600 }
   );
 
   return cachedGetRelatedEvents({
