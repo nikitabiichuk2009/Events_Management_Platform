@@ -209,7 +209,7 @@ export async function getUserTickets({
       try {
         await connectToDB();
 
-        const skip = (page || 1 - 1) * (limit || 10);
+        const skip = (page! - 1) * (limit!);
 
         let matchingEventIds: mongoose.Types.ObjectId[] = [];
         if (query) {
@@ -250,7 +250,7 @@ export async function getUserTickets({
         let tickets = await Order.find(searchQuery)
           .sort(sortOption)
           .skip(skip)
-          .limit(limit || 10)
+          .limit(limit!)
           .populate({
             path: "event",
             model: Event,
