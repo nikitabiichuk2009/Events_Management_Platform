@@ -57,10 +57,10 @@ export type DeleteUserParams = {
 
 export type GetUserTicketsParams = {
   userId: string;
-  query: string;
-  category: string;
-  limit: number;
-  page: number;
+  query?: string;
+  category?: string;
+  limit?: number;
+  page?: number;
 }
 
 export interface GetUserStatsParams {
