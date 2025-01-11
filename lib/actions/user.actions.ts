@@ -87,6 +87,9 @@ export async function deleteUser(userData: DeleteUserParams): Promise<IUser> {
     revalidatePath("/community");
     revalidatePath("/categories");
     revalidateTag("events_by_category")
+    revalidatePath("/orders");
+    revalidatePath("/saved");
+
     return user;
   } catch (err) {
     console.error("Error deleting user and related data:", err);
@@ -161,6 +164,16 @@ export async function getUserOrganizedEvents({
           break;
         case "old":
           sortOption = { createdAt: 1 };
+          break;
+        case "free":
+          searchQuery.isFree = true;
+          sortOption = { createdAt: -1 };
+          break;
+        case "cheapest":
+          sortOption = { price: 1 };
+          break;
+        case "most-expensive":
+          sortOption = { price: -1 };
           break;
         default:
           sortOption = { createdAt: -1 };
