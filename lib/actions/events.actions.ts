@@ -5,7 +5,7 @@ import User from "../database/models/user.model";
 import Event from "../database/models/event.model";
 import Category from "../database/models/category.model";
 import { CreateEventParams, GetAllEventsParams, UpdateEventParams } from "@/types";
-import { revalidatePath, unstable_cache } from "next/cache";
+import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 import Order from "../database/models/order.model";
 
 export async function createEvent({ userId, event, path }: CreateEventParams): Promise<void> {
@@ -171,6 +171,7 @@ export async function updateEvent({
     revalidatePath("/categories");
     revalidatePath(`/categories/${newCategory._id.toString()}`);
     revalidatePath(`/events/${updatedEvent._id.toString()}`);
+    revalidateTag("user_tickets");
     revalidatePath("/saved");
 
   } catch (error) {
@@ -223,7 +224,7 @@ export async function deleteEventById(eventId: string): Promise<void> {
     revalidatePath(`/categories/${event.category._id.toString()}`)
     revalidatePath(`/events/${event._id.toString()}`)
     revalidatePath(`/profile/${organizer.clerkId}`)
-
+    revalidateTag("user_tickets");
 
     console.log(`Event with ID ${eventId} deleted successfully.`);
   } catch (error) {

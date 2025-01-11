@@ -45,6 +45,8 @@ export async function updateUser(userData: UpdateUserParams): Promise<IUser> {
     revalidateTag("event_by_id");
     revalidatePath("/orders");
     revalidatePath("/saved");
+    revalidateTag("user_tickets");
+    revalidateTag("user_organized_events");
 
     return stringifyObject(updatedUser);
   } catch (err) {
@@ -89,6 +91,8 @@ export async function deleteUser(userData: DeleteUserParams): Promise<IUser> {
     revalidateTag("events_by_category")
     revalidatePath("/orders");
     revalidatePath("/saved");
+    revalidateTag("user_tickets");
+    revalidateTag("user_organized_events");
 
     return user;
   } catch (err) {
@@ -298,7 +302,7 @@ export async function getUserTickets({
         throw new Error("Error fetching user tickets");
       }
     },
-    ["user_tickets", userId],
+    ["user_tickets"],
     { revalidate: 600 }
   );
 
