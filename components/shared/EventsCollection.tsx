@@ -35,7 +35,6 @@ const EventsCollection = async ({
                 hasOrderLink={false}
                 userClerkId={userId || ""}
                 dateOfPurchase={order.createdAt.toString()}
-                isTicket={true}
               />
             </li>
           );

@@ -195,7 +195,7 @@ export default async function EventPage({
                 </Link>
               </div>
             </div>
-            <div className="flex flex-col gap-5">
+            <div className="flex flex-col gap-5 lg:max-w-[30rem] xl:max-w-[35rem]">
               <div className="flex gap-2 md:gap-3 items-center">
                 <Image
                   src="/assets/icons/calendar.svg"
@@ -239,7 +239,7 @@ export default async function EventPage({
             </div>
             <Separator />
             <div className="flex flex-col gap-2">
-              <p className="p-regular-16 xl:p-regular-18 font-spaceGrotesk max-w-[45rem]">
+              <p className="p-regular-16 xl:p-regular-18 font-spaceGrotesk lg:max-w-[45rem]">
                 {event.description}
               </p>
             </div>

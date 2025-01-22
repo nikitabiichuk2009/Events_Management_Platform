@@ -21,6 +21,7 @@ import { EventFilters, TicketFilters } from "@/constants";
 import SearchBar from "@/components/shared/SearchBar";
 import Filter from "@/components/shared/Filter";
 import Pagination from "@/components/shared/Pagination";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Evently | Profile Page",
@@ -38,7 +39,25 @@ export default async function ProfilePage({
   const resolvedParams = await params;
   const profileId = resolvedParams.id;
 
+  if (!profileId) {
+    redirect("/community");
+  }
+
   const resolvedSearchParams = await searchParams;
+
+  const isPurchaseSuccess = resolvedSearchParams.purchaseSuccess === "true";
+
+  if (isPurchaseSuccess) {
+    return (
+      <NoResults
+        title="Congratulations!"
+        description="You successfully purchased an event ticket."
+        buttonTitle="View my tickets"
+        href={`/profile/${profileId}#profile-tickets`}
+        isEventPurchase={true}
+      />
+    );
+  }
 
   const searchQueryEventsOrganized =
     resolvedSearchParams.q_events_organized || "";
