@@ -47,7 +47,7 @@ export default async function ProfilePage({
 
   const isPurchaseSuccess = resolvedSearchParams.purchaseSuccess === "true";
 
-  if (isPurchaseSuccess) {
+  if (isPurchaseSuccess && userId === profileId) {
     return (
       <NoResults
         title="Congratulations!"
