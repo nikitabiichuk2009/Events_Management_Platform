@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import React from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
 import { Event } from "@/types";
 import { formatDateTime } from "@/lib/utils";
@@ -20,12 +20,14 @@ import {
 } from "@/components/ui/alert-dialog";
 import { deleteEventById } from "@/lib/actions/events.actions";
 import { useToast } from "@/hooks/use-toast";
+import { useSearchParams } from "next/navigation";
 
 type EventCardProps = {
   event: Event;
   hasOrderLink: boolean;
   userClerkId: string;
   dateOfPurchase?: string;
+  isTicket?: boolean;
 };
 
 export default function EventCard({
@@ -33,8 +35,24 @@ export default function EventCard({
   hasOrderLink,
   userClerkId,
   dateOfPurchase,
+  isTicket = false,
 }: EventCardProps) {
   const { toast } = useToast();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (isTicket) {
+      const purchaseSuccess = searchParams.get("purchaseSuccess");
+      if (purchaseSuccess === "true") {
+        toast({
+          title: "Congratulations!",
+          description: "You successfully purchased an event ticket.",
+          className: "bg-green-500 text-white border-none",
+        });
+      }
+    }
+  }, [isTicket, searchParams, toast]);
+
   const handleDeleteEvent = async () => {
     try {
       await deleteEventById(event._id);
@@ -175,7 +193,9 @@ export default function EventCard({
                     className="rounded-full object-cover"
                   />
                 </div>
-                <p className="p-medium-16 md:p-medium-14 text-grey-500">@{event.organizer.username}</p>
+                <p className="p-medium-16 md:p-medium-14 text-grey-500">
+                  @{event.organizer.username}
+                </p>
               </div>
             </Link>
             {hasOrderLink && (

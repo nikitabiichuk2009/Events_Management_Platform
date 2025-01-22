@@ -4,11 +4,19 @@ import { connectToDB } from "../database";
 import User from "../database/models/user.model";
 import Event from "../database/models/event.model";
 import Category from "../database/models/category.model";
-import { CreateEventParams, GetAllEventsParams, UpdateEventParams } from "@/types";
+import {
+  CreateEventParams,
+  GetAllEventsParams,
+  UpdateEventParams,
+} from "@/types";
 import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 import Order from "../database/models/order.model";
 
-export async function createEvent({ userId, event, path }: CreateEventParams): Promise<void> {
+export async function createEvent({
+  userId,
+  event,
+  path,
+}: CreateEventParams): Promise<void> {
   try {
     await connectToDB();
 
@@ -61,11 +69,10 @@ export async function createEvent({ userId, event, path }: CreateEventParams): P
     );
 
     revalidatePath(path);
-    revalidatePath("/community")
+    revalidatePath("/community");
     revalidatePath(`/profile/${organizer.clerkId}`);
     revalidatePath("/categories");
     revalidatePath(`/categories/${category._id.toString()}`);
-
   } catch (error) {
     console.error("Error creating event:", error);
     throw new Error("Error creating event");
@@ -80,15 +87,17 @@ export async function updateEvent({
   try {
     await connectToDB();
 
-    const existingEvent = await Event.findById(event._id).populate({
-      path: "organizer",
-      select: "clerkId _id",
-      model: User,
-    }).populate({
-      path: "category",
-      select: "_id name",
-      model: Category,
-    });
+    const existingEvent = await Event.findById(event._id)
+      .populate({
+        path: "organizer",
+        select: "clerkId _id",
+        model: User,
+      })
+      .populate({
+        path: "category",
+        select: "_id name",
+        model: Category,
+      });
 
     if (!existingEvent) {
       throw new Error("Event not found");
@@ -109,7 +118,10 @@ export async function updateEvent({
       },
       { upsert: true, new: true }
     );
-    console.log({ existingEventCategoryName: existingEvent.category.name, newCategoryName: newCategory.name });
+    console.log({
+      existingEventCategoryName: existingEvent.category.name,
+      newCategoryName: newCategory.name,
+    });
     const isCategoryChanged = existingEvent.category.name !== newCategory.name;
 
     await Category.updateOne(
@@ -167,13 +179,11 @@ export async function updateEvent({
 
     revalidateTag("user_tickets");
     revalidatePath(path);
-    revalidatePath("/community")
+    revalidatePath("/community");
     revalidatePath(`/profile/${existingEvent.organizer.clerkId}`);
     revalidatePath("/categories");
     revalidatePath(`/categories/${newCategory._id.toString()}`);
-    revalidatePath(`/events/${updatedEvent._id.toString()}`);
     revalidatePath("/saved");
-
   } catch (error) {
     console.error("Error updating event:", error);
     throw new Error("Error updating event");
@@ -187,7 +197,7 @@ export async function deleteEventById(eventId: string): Promise<void> {
     const event = await Event.findById(eventId).populate({
       path: "category",
       select: "_id",
-      model: Category
+      model: Category,
     });
     if (!event) {
       throw new Error("Event not found");
@@ -207,7 +217,9 @@ export async function deleteEventById(eventId: string): Promise<void> {
 
     await Event.findByIdAndDelete(eventId);
 
-    const organizer = await User.findById(event.organizer._id).select("clerkId _id");
+    const organizer = await User.findById(event.organizer._id).select(
+      "clerkId _id"
+    );
     if (!organizer) {
       throw new Error("Organizer not found");
     }
@@ -216,14 +228,14 @@ export async function deleteEventById(eventId: string): Promise<void> {
       { $inc: { eventsCreatedCount: -1 } }
     );
 
-    revalidatePath("/saved")
-    revalidatePath("/")
-    revalidatePath("/categories")
-    revalidatePath("/community")
-    revalidatePath("/orders")
-    revalidatePath(`/categories/${event.category._id.toString()}`)
-    revalidatePath(`/events/${event._id.toString()}`)
-    revalidatePath(`/profile/${organizer.clerkId}`)
+    revalidatePath("/saved");
+    revalidatePath("/");
+    revalidatePath("/categories");
+    revalidatePath("/community");
+    revalidatePath("/orders");
+    revalidatePath(`/categories/${event.category._id.toString()}`);
+    revalidatePath(`/events/${event._id.toString()}`);
+    revalidatePath(`/profile/${organizer.clerkId}`);
     revalidateTag("user_tickets");
 
     console.log(`Event with ID ${eventId} deleted successfully.`);
@@ -290,7 +302,11 @@ export async function getAllEvents({
           .sort(sortOption)
           .skip(skip)
           .limit(limit)
-          .populate({ path: "organizer", select: "clerkId username photo", model: User })
+          .populate({
+            path: "organizer",
+            select: "clerkId username photo",
+            model: User,
+          })
           .populate({ path: "category", select: "_id name", model: Category })
           .exec();
 
@@ -317,7 +333,11 @@ export async function getEventById(eventId: string) {
         await connectToDB();
 
         const event = await Event.findById(eventId)
-          .populate({ path: "organizer", select: "clerkId username photo firstName lastName", model: User })
+          .populate({
+            path: "organizer",
+            select: "clerkId username photo firstName lastName",
+            model: User,
+          })
           .populate({ path: "category", select: "_id name", model: Category })
           .exec();
 
@@ -345,7 +365,10 @@ export async function getRelatedEvents({
   category = "",
   page = 1,
   limit = 10,
-}: GetAllEventsParams & { categoryId: string; currentEventId: string }): Promise<{
+}: GetAllEventsParams & {
+  categoryId: string;
+  currentEventId: string;
+}): Promise<{
   events: Event[];
   isNext: boolean;
 }> {
@@ -407,7 +430,11 @@ export async function getRelatedEvents({
           .sort(sortOption)
           .skip(skip)
           .limit(limit)
-          .populate({ path: "organizer", select: "clerkId username photo", model: User })
+          .populate({
+            path: "organizer",
+            select: "clerkId username photo",
+            model: User,
+          })
           .populate({ path: "category", select: "_id name", model: Category })
           .exec();
 

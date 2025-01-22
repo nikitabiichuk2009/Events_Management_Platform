@@ -35,6 +35,7 @@ const EventsCollection = async ({
                 hasOrderLink={false}
                 userClerkId={userId || ""}
                 dateOfPurchase={order.createdAt.toString()}
+                isTicket={true}
               />
             </li>
           );
@@ -44,7 +45,9 @@ const EventsCollection = async ({
         collectionType === "Events_Organized") &&
         data.every((item) => "organizer" in item) &&
         data.map((event: Event) => {
-          const hasOrderLink = collectionType === "Events_Organized" && event.organizer.clerkId === userId;
+          const hasOrderLink =
+            collectionType === "Events_Organized" &&
+            event.organizer.clerkId === userId;
           return (
             <li key={event._id} className="w-full md:w-[21rem] lg:w-[23rem]">
               <EventCard

@@ -40,6 +40,8 @@ const ProfileForm = ({ userId, initialValues }: ProfileFormProps) => {
     },
   });
 
+  const isFormUnchanged = Object.keys(form.formState.dirtyFields).length === 0;
+
   const onSubmit = async (values: z.infer<typeof profileSchema>) => {
     if (isSubmitting) return;
 
@@ -135,7 +137,7 @@ const ProfileForm = ({ userId, initialValues }: ProfileFormProps) => {
         <Button
           type="submit"
           className="w-full md:w-fit"
-          disabled={isSubmitting}
+          disabled={isSubmitting || isFormUnchanged}
         >
           {isSubmitting ? "Submitting..." : "Submit"}
         </Button>

@@ -1,8 +1,8 @@
 "use server";
 
 import { CheckoutOrderParams, CreateOrderParams } from "@/types";
-import Stripe from 'stripe';
-import { stringifyObject } from './../utils';
+import Stripe from "stripe";
+import { stringifyObject } from "./../utils";
 import { connectToDB } from "../database";
 import Order from "../database/models/order.model";
 import { revalidatePath } from "next/cache";
@@ -20,7 +20,7 @@ export async function checkoutOrder(order: CheckoutOrderParams) {
             unit_amount: price * 100,
             product_data: {
               name: order.eventTitle,
-              description: order.eventDescription
+              description: order.eventDescription,
             },
           },
           quantity: 1,
@@ -29,10 +29,10 @@ export async function checkoutOrder(order: CheckoutOrderParams) {
       metadata: {
         eventId: order.eventId,
         buyerId: order.buyerId,
-        buyerClerkId: order.buyerClerkId
+        buyerClerkId: order.buyerClerkId,
       },
-      mode: 'payment',
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/profile/${order.buyerClerkId}#profile-tickets`,
+      mode: "payment",
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/profile/${order.buyerClerkId}?purchaseSuccess=true#profile-tickets`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/events/${order.eventId}?cancelledOrder=true`,
     });
     return stringifyObject(session.url);
