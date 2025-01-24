@@ -37,7 +37,6 @@ export async function updateUser(userData: UpdateUserParams): Promise<IUser> {
       { new: true }
     );
     revalidatePath("/");
-    console.log({ path });
     revalidatePath(path);
     revalidatePath(`${path}/update`);
     revalidatePath("/community");
