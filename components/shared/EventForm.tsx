@@ -114,7 +114,6 @@ const EventForm = ({
           description: "Please try again later",
           className: "bg-red-500 text-white border-none",
         });
-        router.push("/");
         return;
       }
     }
