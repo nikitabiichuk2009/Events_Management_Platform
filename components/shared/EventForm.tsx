@@ -109,6 +109,7 @@ const EventForm = ({
           uploadImageUrl = response[0].url;
         }
       } catch (error) {
+        console.log(error);
         toast({
           title: "File upload failed",
           description: "Please try again later",

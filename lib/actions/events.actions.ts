@@ -179,6 +179,7 @@ export async function updateEvent({
 
     revalidateTag("user_tickets");
     revalidatePath(path);
+    revalidatePath(`${path}/update`);
     revalidatePath("/community");
     revalidatePath(`/profile/${existingEvent.organizer.clerkId}`);
     revalidatePath("/categories");

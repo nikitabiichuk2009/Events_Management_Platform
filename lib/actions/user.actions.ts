@@ -38,6 +38,7 @@ export async function updateUser(userData: UpdateUserParams): Promise<IUser> {
     );
     revalidatePath("/");
     revalidatePath(path);
+    revalidatePath(`${path}/update`);
     revalidateTag("user_by_clerk_id"); // for 100% safety
     revalidatePath("/community");
     revalidatePath("/categories");
