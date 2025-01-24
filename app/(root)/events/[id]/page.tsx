@@ -1,6 +1,5 @@
 import React from "react";
 import NoResults from "@/components/shared/NoResults";
-import { Metadata } from "next";
 import { getEventById, getRelatedEvents } from "@/lib/actions/events.actions";
 import { stringifyObject } from "@/lib/utils";
 import Image from "next/image";
@@ -11,7 +10,6 @@ import { auth } from "@clerk/nextjs/server";
 import { getUserByClerkId, getUserTickets } from "@/lib/actions/user.actions";
 import EventDetailsHeader from "@/components/shared/eventDetails/EventDetailsHeader";
 import { SearchParamProps } from "@/types";
-import { redirect } from "next/navigation";
 import Pagination from "@/components/shared/Pagination";
 import EventsCollection from "@/components/shared/EventsCollection";
 import { EventFilters } from "@/constants";
@@ -21,13 +19,58 @@ import CheckoutButton from "@/components/shared/checkout/CheckoutButton";
 import { Button } from "@/components/ui/button";
 import EventDetailsClientDate from "@/components/shared/eventDetails/EventDetailsClientDate";
 
-export const metadata: Metadata = {
-  title: "Evently | Event Details",
-  description: "View details of a specific event on Evently.",
-  icons: {
-    icon: "/assets/images/logo.svg",
-  },
-};
+export async function generateMetadata({
+  params,
+  searchParams,
+}: SearchParamProps) {
+  const resolvedParams = await params;
+  const eventId = resolvedParams.id || "";
+  try {
+    const event = await getEventById(eventId);
+    const eventParsed = stringifyObject(event);
+    const eventTitle = eventParsed.title;
+    const eventDescription = eventParsed.description;
+    const eventImage = eventParsed.imageUrl;
+    return {
+      title: `Evently | ${eventTitle} - Event`,
+      description: eventDescription,
+      icons: {
+        icon: "/assets/images/logo.svg",
+      },
+      openGraph: {
+        title: `Evently | ${eventTitle} - Event`,
+        description: eventDescription,
+        images: [eventImage],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: `Evently | ${eventTitle} - Event`,
+        description: eventDescription,
+        images: [eventImage],
+      },
+    };
+  } catch (err) {
+    console.error(err);
+    return {
+      title: "Evently | Event Details",
+      description: "View details of a specific event on Evently.",
+      icons: {
+        icon: "/assets/images/logo.svg",
+      },
+      openGraph: {
+        title: "Evently | Event Details",
+        description: "View details of a specific event on Evently.",
+        images: ["/assets/images/logo.svg"],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: "Evently | Event Details",
+        description: "View details of a specific event on Evently.",
+        images: ["/assets/images/logo.svg"],
+      },
+    };
+  }
+}
 
 export default async function EventPage({
   params,
@@ -41,9 +84,6 @@ export default async function EventPage({
     ? parseInt(resolvedSearchParams.page, 10)
     : 1;
   const eventId = resolvedParams.id || "";
-  if (!eventId) {
-    redirect("/");
-  }
 
   const cancelledOrder = resolvedSearchParams.cancelledOrder || "";
   if (cancelledOrder) {

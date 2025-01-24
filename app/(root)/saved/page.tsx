@@ -18,6 +18,17 @@ export const metadata: Metadata = {
   icons: {
     icon: "/assets/images/logo.svg",
   },
+  openGraph: {
+    title: "Evently | Saved Events",
+    description: "View all your saved events on Evently.",
+    images: ["/assets/images/hero.png"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Evently | Saved Events",
+    description: "View all your saved events on Evently.",
+    images: ["/assets/images/hero.png"],
+  },
 };
 
 export default async function SavedEventsPage({

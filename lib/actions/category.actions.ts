@@ -138,6 +138,7 @@ export async function getEventsByCategoryId({
         return {
           events,
           isNext: isNextPage,
+          categoryName: categoryExists.name,
         };
       } catch (err) {
         console.error("Error fetching events by category:", err);

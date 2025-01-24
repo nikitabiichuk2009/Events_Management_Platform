@@ -19,6 +19,19 @@ export const metadata: Metadata = {
   icons: {
     icon: "/assets/images/logo.svg",
   },
+  openGraph: {
+    title: "Evently | Home",
+    description:
+      "Explore a wide range of events, connect with organizers, and find the perfect event for you.",
+    images: ["/assets/images/hero.png"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Evently | Home",
+    description:
+      "Explore a wide range of events, connect with organizers, and find the perfect event for you.",
+    images: ["/assets/images/hero.png"],
+  },
 };
 
 export default async function Home({

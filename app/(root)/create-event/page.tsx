@@ -15,6 +15,19 @@ export const metadata: Metadata = {
   icons: {
     icon: "/assets/images/logo.svg",
   },
+  openGraph: {
+    title: "Evently | Create Event",
+    description:
+      "Create an event on Evently, the platform for creating and managing events.",
+    images: ["/assets/images/hero.png"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Evently | Create Event",
+    description:
+      "Create an event on Evently, the platform for creating and managing events.",
+    images: ["/assets/images/hero.png"],
+  },
 };
 
 export default async function CreateEventPage() {

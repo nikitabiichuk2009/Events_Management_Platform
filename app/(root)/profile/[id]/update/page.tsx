@@ -9,6 +9,20 @@ import { getUserByClerkId } from "@/lib/actions/user.actions";
 export const metadata = {
   title: "Evently | Update Profile",
   description: "Edit your personal profile details.",
+  icons: {
+    icon: "/assets/images/logo.svg",
+  },
+  openGraph: {
+    title: "Evently | Update Profile",
+    description: "Edit your personal profile details.",
+    images: ["/assets/images/hero.png"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Evently | Update Profile",
+    description: "Edit your personal profile details.",
+    images: ["/assets/images/hero.png"],
+  },
 };
 
 export default async function UpdateProfilePage({

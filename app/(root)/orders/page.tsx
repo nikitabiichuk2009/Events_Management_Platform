@@ -8,6 +8,25 @@ import { redirect } from "next/navigation";
 import { stringifyObject } from "@/lib/utils";
 import { SearchParamsProps } from "@/types";
 
+export const metadata: Metadata = {
+  title: "Evently | Your Orders",
+  description: "Your orders page of Evently",
+  icons: {
+    icon: "/assets/images/logo.svg",
+  },
+  openGraph: {
+    title: "Evently | Your Orders",
+    description: "Your orders page of Evently",
+    images: ["/assets/images/hero.png"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Evently | Your Orders",
+    description: "Your orders page of Evently",
+    images: ["/assets/images/hero.png"],
+  },
+};
+
 export default async function OrdersPage({
   searchParams,
 }: {

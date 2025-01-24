@@ -21,15 +21,68 @@ import { EventFilters, TicketFilters } from "@/constants";
 import SearchBar from "@/components/shared/SearchBar";
 import Filter from "@/components/shared/Filter";
 import Pagination from "@/components/shared/Pagination";
-import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Evently | Profile Page",
-  description: "Profile page of user",
-  icons: {
-    icon: "/assets/images/site-logo.svg",
-  },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const resolvedParams = await params;
+  const profileId = resolvedParams.id;
+
+  try {
+    const user = await getUserByClerkId(profileId, false);
+    const userParsed = stringifyObject(user);
+    const username = userParsed.username;
+    const userImage = userParsed.photo;
+
+    return {
+      title: `Evently | ${username}'s Profile`,
+      description: `Explore ${username}'s profile, including their organized events, tickets, and interests on Evently.`,
+      icons: {
+        icon: "/assets/images/logo.svg",
+      },
+      openGraph: {
+        title: `Evently | ${username}'s Profile`,
+        description: `Explore ${username}'s profile, including their organized events, tickets, and interests on Evently.`,
+        images: [userImage],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: `Evently | ${username}'s Profile`,
+        description: `Explore ${username}'s profile on Evently.`,
+        images: [userImage],
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching user data for metadata:", error);
+    return {
+      title: "Evently | Profile Page",
+      description: "Profile page of the user",
+      icons: {
+        icon: "/assets/images/logo.svg",
+      },
+      openGraph: {
+        title: "Evently | Profile Page",
+        description: "Profile page of the user",
+        images: [
+          {
+            url: "/assets/images/hero.png",
+            width: 800,
+            height: 800,
+            alt: "Evently logo",
+          },
+        ],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: "Evently | Profile Page",
+        description: "Profile page of the user",
+        images: ["/assets/images/hero.png"],
+      },
+    };
+  }
+}
 
 export default async function ProfilePage({
   params,
@@ -38,10 +91,6 @@ export default async function ProfilePage({
   const { userId } = await auth();
   const resolvedParams = await params;
   const profileId = resolvedParams.id;
-
-  if (!profileId) {
-    redirect("/community");
-  }
 
   const resolvedSearchParams = await searchParams;
 

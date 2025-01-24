@@ -9,13 +9,31 @@ import React from "react";
 
 export const metadata: Metadata = {
   title: "Evently | Edit Event",
-  description: "Edit an event on Evently, the platform for creating and managing events.",
+  description:
+    "Edit an event on Evently, the platform for creating and managing events.",
   icons: {
     icon: "/assets/images/logo.svg",
   },
+  openGraph: {
+    title: "Evently | Edit Event",
+    description:
+      "Edit an event on Evently, the platform for creating and managing events.",
+    images: ["/assets/images/hero.png"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Evently | Edit Event",
+    description:
+      "Edit an event on Evently, the platform for creating and managing events.",
+    images: ["/assets/images/hero.png"],
+  },
 };
 
-export default async function UpdateEventPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function UpdateEventPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { userId } = await auth();
   const resolvedParams = await params;
   let event;
@@ -30,7 +48,9 @@ export default async function UpdateEventPage({ params }: { params: Promise<{ id
     if (event.organizer.clerkId !== userId) {
       return (
         <div className="wrapper flex flex-col items-center">
-          <h1 className="h2-bold text-dark100_light900">403 - Access Forbidden</h1>
+          <h1 className="h2-bold text-dark100_light900">
+            403 - Access Forbidden
+          </h1>
           <NoResults
             title="You are not the event organizer"
             description="You do not have permission to edit this event. Please ensure you are logged in with the correct account. If you believe this is an error, contact support for assistance."
@@ -89,4 +109,4 @@ export default async function UpdateEventPage({ params }: { params: Promise<{ id
       </div>
     </>
   );
-};
+}

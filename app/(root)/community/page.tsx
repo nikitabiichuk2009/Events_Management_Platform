@@ -16,6 +16,17 @@ export const metadata: Metadata = {
   icons: {
     icon: "/assets/images/logo.svg",
   },
+  openGraph: {
+    title: "Evently | Community Page",
+    description: "Explore the Evently community.",
+    images: ["/assets/images/hero.png"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Evently | Community Page",
+    description: "Explore the Evently community.",
+    images: ["/assets/images/hero.png"],
+  },
 };
 
 export default async function CommunityPage({
