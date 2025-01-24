@@ -1,4 +1,5 @@
 "use server";
+import { UTApi } from "uploadthing/server";
 
 import { connectToDB } from "../database";
 import User from "../database/models/user.model";
@@ -102,6 +103,17 @@ export async function updateEvent({
     if (!existingEvent) {
       throw new Error("Event not found");
     }
+    try {
+      if (existingEvent.imageUrl !== event.imageUrl) {
+        const utApi = new UTApi();
+        const existingEventImageUrlKey = existingEvent.imageUrl
+          .split("/")
+          .pop();
+        await utApi.deleteFiles(existingEventImageUrlKey);
+      }
+    } catch (error) {
+      console.error("Error deleting event image:", error);
+    }
 
     if (existingEvent.organizer.clerkId !== userId) {
       throw new Error("You are not authorized to update this event");
@@ -177,6 +189,7 @@ export async function updateEvent({
       { $addToSet: { events: updatedEvent._id } }
     );
 
+    revalidatePath("/");
     revalidateTag("user_tickets");
     revalidatePath(path);
     revalidatePath(`${path}/update`);
@@ -202,6 +215,13 @@ export async function deleteEventById(eventId: string): Promise<void> {
     });
     if (!event) {
       throw new Error("Event not found");
+    }
+    try {
+      const utApi = new UTApi();
+      const eventImageUrlKey = event.imageUrl.split("/").pop();
+      await utApi.deleteFiles(eventImageUrlKey);
+    } catch (error) {
+      console.error("Error deleting event image:", error);
     }
 
     await Category.updateOne(
