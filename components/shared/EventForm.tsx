@@ -115,6 +115,7 @@ const EventForm = ({
           className: "bg-red-500 text-white border-none",
         });
         router.push("/");
+        return;
       }
     }
     try {
