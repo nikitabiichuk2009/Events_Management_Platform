@@ -7,6 +7,7 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { stringifyObject } from "@/lib/utils";
 import { SearchParamsProps } from "@/types";
+import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Evently | Your Orders",
