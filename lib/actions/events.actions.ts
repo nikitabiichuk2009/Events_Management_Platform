@@ -333,8 +333,9 @@ export async function getAllEvents({
 
         const totalEventsCount = await Event.countDocuments(searchQuery);
         const isNextPage = totalEventsCount > skip + allEvents.length;
+        const totalEventsCountWithoutQuery = await Event.countDocuments();
 
-        return { allEvents, isNextPage, totalEventsCount };
+        return { allEvents, isNextPage, totalEventsCount: totalEventsCountWithoutQuery };
       } catch (err: any) {
         console.error("Error fetching all events:", err);
         throw new Error("Error fetching all events");
