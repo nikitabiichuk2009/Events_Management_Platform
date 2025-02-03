@@ -57,6 +57,7 @@ export default async function CategoryPage({
     ? parseInt(resolvedSearchParams.page, 10)
     : 1;
 
+  let resetPageCount;
   let events;
   let isNext;
   let categoryName;
@@ -71,6 +72,7 @@ export default async function CategoryPage({
     const parsedResult = stringifyObject(result);
     events = parsedResult.events;
     isNext = parsedResult.isNext;
+    resetPageCount = parsedResult.resetPageCount;
     categoryName = parsedResult.categoryName;
   } catch (error) {
     console.error("Error fetching category events:", error);
@@ -105,6 +107,7 @@ export default async function CategoryPage({
             route={`/categories/${categoryId}`}
             imgSrc="/assets/icons/search.svg"
             otherClasses="flex-1"
+            resetPageCount={resetPageCount}
           />
           <Filter
             filters={EventFilters}

@@ -45,7 +45,7 @@ export default async function CategoriesPage({
 
   let allCategories;
   let isNext;
-
+  let resetPageCount;
   try {
     const categories = await getAllCategories({
       query: searchQuery,
@@ -55,6 +55,7 @@ export default async function CategoriesPage({
     });
     allCategories = stringifyObject(categories.categories);
     isNext = categories.isNext;
+    resetPageCount = categories.resetPageCount;
   } catch (error) {
     console.error("Error fetching categories:", error);
     return (
@@ -89,6 +90,7 @@ export default async function CategoriesPage({
             route="/categories"
             imgSrc="/assets/icons/search.svg"
             otherClasses="flex-1"
+            resetPageCount={resetPageCount}
           />
           <Filter
             filters={CategoryFilters}
@@ -120,4 +122,4 @@ export default async function CategoriesPage({
       </section>
     </>
   );
-};
+}

@@ -12,6 +12,8 @@ const SearchBar = ({
   imgSrc,
   otherClasses,
   searchName,
+  resetPageCount,
+  pageResetKey,
 }: {
   searchFor: string;
   iconPosition: string;
@@ -19,6 +21,8 @@ const SearchBar = ({
   otherClasses?: string;
   route?: string;
   searchName?: string;
+  resetPageCount?: boolean;
+  pageResetKey?: string;
 }) => {
   const router = useRouter();
   const pathName = usePathname();
@@ -29,24 +33,28 @@ const SearchBar = ({
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    const currentParams = new URLSearchParams(searchParams.toString());
     const delayDebounceFn = setTimeout(() => {
       if (search) {
+        if (resetPageCount) {
+          currentParams.delete(pageResetKey || "page");
+        }
         const newUrl = formUrlQuery({
-          params: searchParams.toString(),
+          params: currentParams.toString(),
           key: searchName || "q",
           value: search,
         });
         router.push(newUrl, { scroll: false });
       } else {
         const newUrl = removeKeysFromQuery({
-          params: searchParams.toString(),
+          params: currentParams.toString(),
           keys: [searchName || "q"],
         });
         router.push(newUrl, { scroll: false });
       }
       return () => clearTimeout(delayDebounceFn);
     }, 300);
-  }, [search, pathName, searchParams, query, router, route]);
+  }, [search, pathName, searchParams, query, router, route, resetPageCount]);
 
   const handleImageClick = () => {
     if (inputRef.current) {

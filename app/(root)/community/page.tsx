@@ -44,7 +44,7 @@ export default async function CommunityPage({
 
   let allUsers;
   let isNext;
-
+  let resetPageCount;
   try {
     const users = await getAllUsers({
       query: searchQuery,
@@ -54,6 +54,7 @@ export default async function CommunityPage({
     });
     allUsers = stringifyObject(users.users);
     isNext = users.isNextPage;
+    resetPageCount = users.resetPageCount;  
   } catch (error) {
     console.error("Error fetching users:", error);
     return (
@@ -87,6 +88,7 @@ export default async function CommunityPage({
             route="/community"
             imgSrc="/assets/icons/search.svg"
             otherClasses="flex-1"
+            resetPageCount={resetPageCount}
           />
           <Filter
             filters={UserFilters}

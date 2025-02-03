@@ -102,6 +102,7 @@ export default async function EventPage({
   let userTickets;
   let relatedEvents;
   let isNext;
+  let resetPageCount;
   let hasErrorOccurredDuringLoadingRelatedEvents = false;
   const { userId } = await auth();
   if (userId) {
@@ -113,6 +114,7 @@ export default async function EventPage({
       });
       const parsedTickets = stringifyObject(unParsedTickets);
       userTickets = parsedTickets.tickets;
+      resetPageCount = parsedTickets.resetPageCount;
     } catch (err) {
       console.error(err);
       return (
@@ -298,6 +300,7 @@ export default async function EventPage({
             route={`/events/${event._id}`}
             imgSrc="/assets/icons/search.svg"
             otherClasses="flex-1"
+            resetPageCount={resetPageCount}
           />
           <Filter
             filters={EventFilters}

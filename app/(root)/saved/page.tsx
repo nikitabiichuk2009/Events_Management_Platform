@@ -50,6 +50,7 @@ export default async function SavedEventsPage({
 
   let savedEvents;
   let isNext;
+  let resetPageCount;
 
   try {
     const result = await getUserSavedEventsByClerkId({
@@ -62,6 +63,7 @@ export default async function SavedEventsPage({
     const parsedResult = stringifyObject(result);
     savedEvents = parsedResult.savedEvents;
     isNext = parsedResult.isNextPage;
+    resetPageCount = parsedResult.resetPageCount;
   } catch (error) {
     console.error("Error fetching saved events:", error);
     return (
@@ -95,6 +97,7 @@ export default async function SavedEventsPage({
             route="/saved-events"
             imgSrc="/assets/icons/search.svg"
             otherClasses="flex-1"
+            resetPageCount={resetPageCount}
           />
           <Filter
             filters={EventFilters}

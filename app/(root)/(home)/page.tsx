@@ -50,6 +50,7 @@ export default async function Home({
   let events;
   let eventsCount = 0;
   let isNext;
+  let resetPageCount;
   try {
     const result = await getAllEvents({
       query: searchQuery,
@@ -61,6 +62,7 @@ export default async function Home({
     events = parsedResult.allEvents;
     eventsCount = parsedResult.totalEventsCount;
     isNext = parsedResult.isNextPage;
+    resetPageCount = parsedResult.resetPageCount;
   } catch (err) {
     console.log(err);
     return (
@@ -116,6 +118,7 @@ export default async function Home({
             route="/"
             imgSrc="/assets/icons/search.svg"
             otherClasses="flex-1"
+            resetPageCount={resetPageCount}
           />
           <Filter
             filters={EventFilters}

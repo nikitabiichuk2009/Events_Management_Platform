@@ -8,7 +8,13 @@ import Event from "../database/models/event.model";
 import User from "../database/models/user.model";
 import { unstable_cache } from "next/cache";
 
-export async function getAllCategories(params: GetAllCategoriesParams): Promise<{ categories: ICategory[], isNext: boolean }> {
+export async function getAllCategories(
+  params: GetAllCategoriesParams
+): Promise<{
+  categories: ICategory[];
+  isNext: boolean;
+  resetPageCount: boolean;
+}> {
   const cachedGetAllCategories = unstable_cache(
     async (params: GetAllCategoriesParams) => {
       try {
@@ -38,6 +44,8 @@ export async function getAllCategories(params: GetAllCategoriesParams): Promise<
             break;
         }
 
+        const skip = (page - 1) * limit;
+
         const categories = await Category.aggregate([
           { $match: searchQuery },
           {
@@ -46,14 +54,16 @@ export async function getAllCategories(params: GetAllCategoriesParams): Promise<
             },
           },
           { $sort: sortOption },
-          { $skip: (page - 1) * limit },
+          { $skip: skip },
           { $limit: limit },
         ]);
 
         const totalCategories = await Category.countDocuments(searchQuery);
-        const hasNextPage = totalCategories > (page - 1) * limit + categories.length;
+        const hasNextPage =
+          totalCategories > (page - 1) * limit + categories.length;
+        const resetPageCount = totalCategories < skip;
 
-        return { categories, isNext: hasNextPage };
+        return { categories, isNext: hasNextPage, resetPageCount };
       } catch (err) {
         console.error("Error getting all categories:", err);
         throw new Error("Error getting all categories");
@@ -72,9 +82,19 @@ export async function getEventsByCategoryId({
   filter = "",
   page = 1,
   limit = 10,
-}: GetEventsByCategoryIdParams): Promise<{ events: Event[], isNext: boolean }> {
+}: GetEventsByCategoryIdParams): Promise<{
+  events: Event[];
+  isNext: boolean;
+  resetPageCount: boolean;
+}> {
   const cachedGetEventsByCategoryId = unstable_cache(
-    async ({ categoryId, query, filter, page, limit }: GetEventsByCategoryIdParams) => {
+    async ({
+      categoryId,
+      query,
+      filter,
+      page,
+      limit,
+    }: GetEventsByCategoryIdParams) => {
       try {
         await connectToDB();
 
@@ -128,17 +148,22 @@ export async function getEventsByCategoryId({
           .sort(sortOption)
           .skip(skip)
           .limit(limit)
-          .populate({ path: "organizer", select: "clerkId username photo", model: User })
+          .populate({
+            path: "organizer",
+            select: "clerkId username photo",
+            model: User,
+          })
           .populate({ path: "category", select: "_id name", model: Category })
           .exec();
 
         const totalEventsCount = await Event.countDocuments(searchQuery);
         const isNextPage = totalEventsCount > skip + events.length;
-
+        const resetPageCount = totalEventsCount < skip;
         return {
           events,
           isNext: isNextPage,
           categoryName: categoryExists.name,
+          resetPageCount,
         };
       } catch (err) {
         console.error("Error fetching events by category:", err);
@@ -149,5 +174,11 @@ export async function getEventsByCategoryId({
     { tags: ["events_by_category"], revalidate: 600 }
   );
 
-  return cachedGetEventsByCategoryId({ categoryId, query, filter, page, limit });
+  return cachedGetEventsByCategoryId({
+    categoryId,
+    query,
+    filter,
+    page,
+    limit,
+  });
 }

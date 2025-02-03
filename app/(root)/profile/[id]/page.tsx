@@ -122,6 +122,9 @@ export default async function ProfilePage({
     ? parseInt(resolvedSearchParams.page_tickets, 10)
     : 1;
 
+  let resetPageCountUserTickets;
+  let resetPageCountUserOrganizedEvents;
+
   let userParsed;
   let formattedJoinedDate;
   let organizedEvents: Event[] = [];
@@ -179,9 +182,11 @@ export default async function ProfilePage({
     userTickets = parsedTickets.tickets;
     userTicketsCount = userTickets.length;
     isNextTicketsPage = parsedTickets.isNextPage;
+    resetPageCountUserTickets = parsedTickets.resetPageCount;
   } catch (error) {
     console.error("Error fetching user tickets:", error);
     hasErrorOccurredDuringTicketsFetch = true;
+    resetPageCountUserTickets = false;
   }
 
   try {
@@ -196,9 +201,11 @@ export default async function ProfilePage({
     organizedEvents = parsedEvents.events;
     organizedEventsCount = parsedEvents.totalOrganizedEventsCount;
     isNextOrganizedEvents = parsedEvents.isNextPage;
+    resetPageCountUserOrganizedEvents = parsedEvents.resetPageCount;
   } catch (error) {
     console.error("Error fetching organized events:", error);
     hasErrorOccurredDuringOrganizedEventsFetch = true;
+    resetPageCountUserOrganizedEvents = false;
   }
 
   return (
@@ -288,6 +295,8 @@ export default async function ProfilePage({
                 imgSrc="/assets/icons/search.svg"
                 otherClasses="flex-1"
                 searchName="q_tickets"
+                resetPageCount={resetPageCountUserTickets}
+                pageResetKey="page_tickets"
               />
               <Filter
                 filters={TicketFilters}
@@ -404,6 +413,8 @@ export default async function ProfilePage({
                 imgSrc="/assets/icons/search.svg"
                 otherClasses="flex-1"
                 searchName="q_events_organized"
+                resetPageCount={resetPageCountUserOrganizedEvents}
+                pageResetKey="page_events_organized"
               />
               <Filter
                 filters={EventFilters}

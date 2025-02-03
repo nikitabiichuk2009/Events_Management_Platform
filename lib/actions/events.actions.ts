@@ -275,6 +275,7 @@ export async function getAllEvents({
   allEvents: any[];
   isNextPage: boolean;
   totalEventsCount: number;
+  resetPageCount: boolean;
 }> {
   const cachedGetAllEvents = unstable_cache(
     async ({ query, category, limit, page }: GetAllEventsParams) => {
@@ -332,10 +333,16 @@ export async function getAllEvents({
           .exec();
 
         const totalEventsCount = await Event.countDocuments(searchQuery);
+        const resetPageCount = totalEventsCount < skip;
         const isNextPage = totalEventsCount > skip + allEvents.length;
         const totalEventsCountWithoutQuery = await Event.countDocuments();
 
-        return { allEvents, isNextPage, totalEventsCount: totalEventsCountWithoutQuery };
+        return {
+          allEvents,
+          isNextPage,
+          totalEventsCount: totalEventsCountWithoutQuery,
+          resetPageCount,
+        };
       } catch (err: any) {
         console.error("Error fetching all events:", err);
         throw new Error("Error fetching all events");
@@ -393,6 +400,7 @@ export async function getRelatedEvents({
 }): Promise<{
   events: Event[];
   isNext: boolean;
+  resetPageCount: boolean;
 }> {
   const cachedGetRelatedEvents = unstable_cache(
     async ({
@@ -461,9 +469,10 @@ export async function getRelatedEvents({
           .exec();
 
         const totalCount = await Event.countDocuments(searchQuery);
+        const resetPageCount = totalCount < skip;
         const isNextPage = totalCount > skip + events.length;
 
-        return { events, isNext: isNextPage };
+        return { events, isNext: isNextPage, resetPageCount };
       } catch (err) {
         console.error("Error fetching related events:", err);
         throw new Error("Error fetching related events");

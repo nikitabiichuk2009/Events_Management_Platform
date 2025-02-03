@@ -6,9 +6,18 @@ import User, { IUser } from "../database/models/user.model";
 import Order from "../database/models/order.model";
 import Category from "../database/models/category.model";
 import Event, { IEvent } from "../database/models/event.model";
-import { CreateUserParams, DeleteUserParams, GetSavedEventsByUserParams, SaveEventParams, UpdateUserParams, GetUserTicketsParams, GetAllUsersParams, GetUserOrganizedEventsParams } from "@/types";
+import {
+  CreateUserParams,
+  DeleteUserParams,
+  GetSavedEventsByUserParams,
+  SaveEventParams,
+  UpdateUserParams,
+  GetUserTicketsParams,
+  GetAllUsersParams,
+  GetUserOrganizedEventsParams,
+} from "@/types";
 import { FilterQuery } from "mongoose";
-import { stringifyObject } from '@/lib/utils';
+import { stringifyObject } from "@/lib/utils";
 import mongoose from "mongoose";
 
 export async function createUser(userData: CreateUserParams): Promise<IUser> {
@@ -31,11 +40,9 @@ export async function updateUser(userData: UpdateUserParams): Promise<IUser> {
   await connectToDB();
 
   try {
-    const updatedUser = await User.findOneAndUpdate(
-      { clerkId },
-      updateData,
-      { new: true }
-    );
+    const updatedUser = await User.findOneAndUpdate({ clerkId }, updateData, {
+      new: true,
+    });
     revalidatePath("/");
     revalidatePath(path);
     revalidatePath(`${path}/update`);
@@ -88,7 +95,7 @@ export async function deleteUser(userData: DeleteUserParams): Promise<IUser> {
     revalidatePath("/");
     revalidatePath("/community");
     revalidatePath("/categories");
-    revalidateTag("events_by_category")
+    revalidateTag("events_by_category");
     revalidatePath("/orders");
     revalidatePath("/saved");
     revalidateTag("user_tickets");
@@ -101,7 +108,9 @@ export async function deleteUser(userData: DeleteUserParams): Promise<IUser> {
   }
 }
 
-export async function getUserCategories(userId: string): Promise<{ name: string; id: string }[]> {
+export async function getUserCategories(
+  userId: string
+): Promise<{ name: string; id: string }[]> {
   const cachedGetUserCategories = unstable_cache(
     async (userId: string) => {
       try {
@@ -116,10 +125,12 @@ export async function getUserCategories(userId: string): Promise<{ name: string;
             },
           },
         ]);
-        const categories = categoriesResult.map((category: { name: string; _id: string }) => ({
-          name: category.name,
-          id: category._id.toString(),
-        }));
+        const categories = categoriesResult.map(
+          (category: { name: string; _id: string }) => ({
+            name: category.name,
+            id: category._id.toString(),
+          })
+        );
         return categories;
       } catch (error) {
         console.error("Error fetching user categories:", error);
@@ -139,9 +150,20 @@ export async function getUserOrganizedEvents({
   category = "",
   page = 1,
   limit = 10,
-}: GetUserOrganizedEventsParams): Promise<{ events: Event[]; isNextPage: boolean; totalOrganizedEventsCount: number }> {
+}: GetUserOrganizedEventsParams): Promise<{
+  events: Event[];
+  isNextPage: boolean;
+  totalOrganizedEventsCount: number;
+  resetPageCount: boolean;
+}> {
   const cachedGetUserOrganizedEvents = unstable_cache(
-    async ({ userId, query, category, page, limit }: GetUserOrganizedEventsParams) => {
+    async ({
+      userId,
+      query,
+      category,
+      page,
+      limit,
+    }: GetUserOrganizedEventsParams) => {
       await connectToDB();
 
       const skip = (page - 1) * limit;
@@ -189,13 +211,19 @@ export async function getUserOrganizedEvents({
         .skip(skip)
         .limit(limit)
         .populate({ path: "category", select: "_id name", model: Category })
-        .populate({ path: "organizer", select: "clerkId username photo", model: User });
+        .populate({
+          path: "organizer",
+          select: "clerkId username photo",
+          model: User,
+        });
 
       const totalCount = await Event.countDocuments(searchQuery);
-      const totalOrganizedEventsCount = await Event.countDocuments({ organizer: userObjectId });
+      const totalOrganizedEventsCount = await Event.countDocuments({
+        organizer: userObjectId,
+      });
       const isNextPage = totalCount > skip + events.length;
-
-      return { events, isNextPage, totalOrganizedEventsCount };
+      const resetPageCount = totalCount < skip;
+      return { events, isNextPage, totalOrganizedEventsCount, resetPageCount };
     },
     ["user_organized_events"],
     { tags: ["user_organized_events"], revalidate: 600 }
@@ -211,31 +239,23 @@ export async function getUserTickets({
   limit = 10,
   page = 1,
 }: GetUserTicketsParams): Promise<{
-  tickets: typeof Order[];
+  tickets: (typeof Order)[];
   isNextPage: boolean;
   totalTicketsCount: number;
+  resetPageCount: boolean;
 }> {
   const cachedGetUserTickets = unstable_cache(
-    async ({
-      userId,
-      query,
-      category,
-      limit,
-      page,
-    }: GetUserTicketsParams) => {
+    async ({ userId, query, category, limit, page }: GetUserTicketsParams) => {
       try {
         await connectToDB();
 
-        const skip = (page! - 1) * (limit!);
+        const skip = (page! - 1) * limit!;
 
         let matchingEventIds: mongoose.Types.ObjectId[] = [];
         if (query) {
           const searchRegex = new RegExp(query, "i");
           const matchingEvents = await Event.find({
-            $or: [
-              { title: searchRegex },
-              { description: searchRegex },
-            ],
+            $or: [{ title: searchRegex }, { description: searchRegex }],
           }).select("_id");
           matchingEventIds = matchingEvents.map((event) => event._id);
         }
@@ -295,8 +315,8 @@ export async function getUserTickets({
         const totalCount = await Order.countDocuments(searchQuery);
         const totalTicketsCount = await Order.countDocuments({ buyer: userId });
         const isNextPage = totalCount > skip + tickets.length;
-
-        return { tickets, isNextPage, totalTicketsCount };
+        const resetPageCount = totalCount < skip;
+        return { tickets, isNextPage, totalTicketsCount, resetPageCount };
       } catch (err) {
         console.error("Error fetching user tickets:", err);
         throw new Error("Error fetching user tickets");
@@ -309,7 +329,10 @@ export async function getUserTickets({
   return cachedGetUserTickets({ userId, query, category, limit, page });
 }
 
-export async function getUserByClerkId(clerkId: string, shouldPopulateSavedEvents: boolean) {
+export async function getUserByClerkId(
+  clerkId: string,
+  shouldPopulateSavedEvents: boolean
+) {
   const cachedGetUserByClerkId = unstable_cache(
     async (clerkId: string) => {
       await connectToDB();
@@ -362,7 +385,6 @@ export async function saveEvent(params: SaveEventParams): Promise<void> {
 
     revalidatePath(path);
     revalidatePath("/saved");
-
   } catch (err) {
     console.error("Error saving event:", err);
     throw new Error("Error saving event.");
@@ -378,9 +400,16 @@ export async function getUserSavedEventsByClerkId({
 }: GetSavedEventsByUserParams): Promise<{
   savedEvents: Event[];
   isNextPage: boolean;
+  resetPageCount: boolean;
 }> {
   const cachedGetUserSavedEventsByClerkId = unstable_cache(
-    async ({ clerkId, query, category, limit, page }: GetSavedEventsByUserParams) => {
+    async ({
+      clerkId,
+      query,
+      category,
+      limit,
+      page,
+    }: GetSavedEventsByUserParams) => {
       try {
         await connectToDB();
 
@@ -396,7 +425,11 @@ export async function getUserSavedEventsByClerkId({
         const skip = (page - 1) * limit;
 
         const searchQuery: FilterQuery<IEvent & { _id: string }> = {
-          _id: { $in: user.savedEvents.map((event: IEvent & { _id: string }) => event._id) },
+          _id: {
+            $in: user.savedEvents.map(
+              (event: IEvent & { _id: string }) => event._id
+            ),
+          },
         };
 
         if (query) {
@@ -439,14 +472,19 @@ export async function getUserSavedEventsByClerkId({
           .sort(sortOption)
           .skip(skip)
           .limit(limit)
-          .populate({ path: "organizer", select: "clerkId username photo", model: User })
+          .populate({
+            path: "organizer",
+            select: "clerkId username photo",
+            model: User,
+          })
           .populate({ path: "category", select: "_id name", model: Category })
           .exec();
 
         const totalSavedEventsCount = await Event.countDocuments(searchQuery);
+        const resetPageCount = totalSavedEventsCount < skip;
         const isNextPage = totalSavedEventsCount > skip + savedEvents.length;
 
-        return { savedEvents, isNextPage };
+        return { savedEvents, isNextPage, resetPageCount };
       } catch (err) {
         console.error("Error fetching saved events:", err);
         throw new Error("Error fetching saved events");
@@ -456,7 +494,13 @@ export async function getUserSavedEventsByClerkId({
     { tags: ["user_saved_events_by_clerk_id"], revalidate: 600 }
   );
 
-  return cachedGetUserSavedEventsByClerkId({ clerkId, query, category, limit, page });
+  return cachedGetUserSavedEventsByClerkId({
+    clerkId,
+    query,
+    category,
+    limit,
+    page,
+  });
 }
 
 export async function getUserOrganizedEventsAndOrders(clerkId: string) {
@@ -519,6 +563,7 @@ export async function getAllUsers({
   users: IUser[];
   isNextPage: boolean;
   totalUsersCount: number;
+  resetPageCount: boolean;
 }> {
   const cachedGetAllUsers = unstable_cache(
     async ({ query, filter, page, limit }: GetAllUsersParams) => {
@@ -554,13 +599,15 @@ export async function getAllUsers({
         .sort(sortOption)
         .skip(skip)
         .limit(limit)
-        .select("_id clerkId username firstName lastName photo eventsCreatedCount")
+        .select(
+          "_id clerkId username firstName lastName photo eventsCreatedCount"
+        )
         .exec();
 
       const totalUsersCount = await User.countDocuments(searchQuery);
       const isNextPage = totalUsersCount > skip + users.length;
-
-      return { users, isNextPage, totalUsersCount };
+      const resetPageCount = totalUsersCount < skip;
+      return { users, isNextPage, totalUsersCount, resetPageCount };
     },
     ["all_users"],
     { tags: ["all_users"], revalidate: 600 }
