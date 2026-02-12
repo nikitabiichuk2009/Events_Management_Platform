@@ -20,5 +20,14 @@ export default clerkMiddleware(async (auth, request) => {
 })
 
 export const config = {
-  matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
+  matcher: [
+    /*
+     * Only match private routes that need authentication.
+     * Excludes:
+     * - Static files (with extensions) and _next internals
+     * - Public routes: /, /sign-in, /sign-up, /events/:id, /profile/:id, /categories, /community
+     * - Public API routes: /api/webhook, /api/uploadthing
+     */
+    '/((?!_next|.+\\.[\\w]+$|^/$|^/sign-in|^/sign-up|^/events/[^/]+$|^/profile/[^/]+$|^/categories|^/community|^/api/webhook|^/api/uploadthing).*)',
+  ],
 };
